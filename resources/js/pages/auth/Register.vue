@@ -7,6 +7,8 @@ import { Label } from '@/components/ui/label';
 import AuthBase from '@/layouts/AuthLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+import Password from 'primevue/password';
+import { ref } from 'vue';
 
 const form = useForm({
     username: '',
@@ -14,6 +16,7 @@ const form = useForm({
     password: '',
     password_confirmation: '',
 });
+const value = ref(null);
 
 const submit = () => {
     form.post(route('register'), {
@@ -40,23 +43,26 @@ const submit = () => {
                     <InputError :message="form.errors.email" />
                 </div>
 
-                <div class="grid gap-2">
+                <div class="grid gap-2 w-full">
                     <Label for="password">Password</Label>
-                    <Input
-                        id="password"
-                        type="password"
-                        required
-                        :tabindex="3"
-                        autocomplete="new-password"
-                        v-model="form.password"
-                        placeholder="Password"
+                   <Password
+                    id="password"
+                    type="password"
+                    v-model="form.password"
+                    placeholder="Password"
+                    :tabindex="3"
+                    autocomplete="new-password"
+                    toggleMask
+                    inputClass="w-full" 
+                    class="w-full"
                     />
+
                     <InputError :message="form.errors.password" />
                 </div>
 
                 <div class="grid gap-2">
                     <Label for="password_confirmation">Confirm password</Label>
-                    <Input
+                    <Password
                         id="password_confirmation"
                         type="password"
                         required
@@ -64,6 +70,10 @@ const submit = () => {
                         autocomplete="new-password"
                         v-model="form.password_confirmation"
                         placeholder="Confirm password"
+                        inputClass="w-full"
+                        class="w-full"
+                        toggleMask
+                        :feedback="false"
                     />
                     <InputError :message="form.errors.password_confirmation" />
                 </div>
