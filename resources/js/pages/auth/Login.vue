@@ -15,7 +15,7 @@ defineProps<{
 }>();
 
 const form = useForm({
-    email: '',
+    username: '',
     password: '',
     remember: false,
 });
@@ -28,46 +28,34 @@ const submit = () => {
 </script>
 
 <template>
-    <AuthBase title="Log in to your account" description="Enter your email and password below to log in">
+    <AuthBase title="Log in to your account" description="Enter your username and password below to log in">
+
         <Head title="Log in" />
 
         <div v-if="status" class="mb-4 text-center text-sm font-medium text-green-600">
             {{ status }}
         </div>
 
+
         <form @submit.prevent="submit" class="flex flex-col gap-6">
             <div class="grid gap-6">
                 <div class="grid gap-2">
-                    <Label for="email">Email address</Label>
-                    <Input
-                        id="email"
-                        type="email"
-                        required
-                        autofocus
-                        :tabindex="1"
-                        autocomplete="email"
-                        v-model="form.email"
-                        placeholder="email@example.com"
-                    />
-                    <InputError :message="form.errors.email" />
+                    <Label for="username">Username</Label>
+                    <Input id="username" type="text" required autofocus :tabindex="1" autocomplete="username"
+                        v-model="form.username" placeholder="Username" />
+                    <InputError :message="form.errors.username" />
                 </div>
 
                 <div class="grid gap-2">
                     <div class="flex items-center justify-between">
                         <Label for="password">Password</Label>
-                        <TextLink v-if="canResetPassword" :href="route('password.request')" class="text-sm" :tabindex="5">
+                        <TextLink v-if="canResetPassword" :href="route('password.request')" class="text-sm"
+                            :tabindex="5">
                             Forgot password?
                         </TextLink>
                     </div>
-                    <Input
-                        id="password"
-                        type="password"
-                        required
-                        :tabindex="2"
-                        autocomplete="current-password"
-                        v-model="form.password"
-                        placeholder="Password"
-                    />
+                    <Input id="password" type="password" required :tabindex="2" autocomplete="current-password"
+                        v-model="form.password" placeholder="Password" />
                     <InputError :message="form.errors.password" />
                 </div>
 
@@ -82,6 +70,14 @@ const submit = () => {
                     <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
                     Log in
                 </Button>
+                <div class="relative">
+                    <div class="text-center mb-2 text-base text-sm text-gray-900">OR</div>
+                    <a href="/auth/google"
+                        class="flex items-center justify-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100">
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="h-5 w-5" />
+                        Continue with Google
+                    </a>
+                </div>
             </div>
 
             <div class="text-center text-sm text-muted-foreground">
