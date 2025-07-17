@@ -24,6 +24,7 @@
     },
     "dependencies": {
         "@inertiajs/vue3": "^2.0.0",
+        "@primeuix/themes": "^1.2.1",
         "@tailwindcss/vite": "^4.1.1",
         "@vitejs/plugin-vue": "^5.2.1",
         "@vueuse/core": "^12.8.2",
@@ -32,6 +33,9 @@
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^1.0",
         "lucide-vue-next": "^0.468.0",
+        "primeflex": "^4.0.0",
+        "primeicons": "^7.0.0",
+        "primevue": "^4.3.6",
         "reka-ui": "^2.2.0",
         "tailwind-merge": "^3.2.0",
         "tailwindcss": "^4.1.1",
