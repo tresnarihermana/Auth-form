@@ -7,6 +7,9 @@ import { Label } from '@/components/ui/label';
 import AuthBase from '@/layouts/AuthLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+import Password from 'primevue/password';
+import InputText from 'primevue/inputtext';
+import { ref } from 'vue';
 
 const form = useForm({
     username: '',
@@ -14,6 +17,7 @@ const form = useForm({
     password: '',
     password_confirmation: '',
 });
+const value = ref(null);
 
 const submit = () => {
     form.post(route('register'), {
@@ -30,33 +34,36 @@ const submit = () => {
             <div class="grid gap-6">
                 <div class="grid gap-2">
                     <Label for="username">Username</Label>
-                    <Input id="username" type="text" required autofocus :tabindex="1" autocomplete="username" v-model="form.username" placeholder="Enter your username" />
+                    <InputText id="username" type="text" required autofocus :tabindex="1" autocomplete="username" v-model="form.username" placeholder="Enter your username" />
                     <InputError :message="form.errors.username" />
                 </div>
 
                 <div class="grid gap-2">
                     <Label for="email">Email address</Label>
-                    <Input id="email" type="email" required :tabindex="2" autocomplete="email" v-model="form.email" placeholder="email@example.com" />
+                    <InputText id="email" type="email" required :tabindex="2" autocomplete="email" v-model="form.email" placeholder="email@example.com" />
                     <InputError :message="form.errors.email" />
                 </div>
 
-                <div class="grid gap-2">
+                <div class="grid gap-2 w-full">
                     <Label for="password">Password</Label>
-                    <Input
-                        id="password"
-                        type="password"
-                        required
-                        :tabindex="3"
-                        autocomplete="new-password"
-                        v-model="form.password"
-                        placeholder="Password"
+                   <Password
+                    id="password"
+                    type="password"
+                    v-model="form.password"
+                    placeholder="Password"
+                    :tabindex="3"
+                    autocomplete="new-password"
+                    toggleMask
+                    inputClass="w-full" 
+                    class="w-full"
                     />
+
                     <InputError :message="form.errors.password" />
                 </div>
 
                 <div class="grid gap-2">
                     <Label for="password_confirmation">Confirm password</Label>
-                    <Input
+                    <Password
                         id="password_confirmation"
                         type="password"
                         required
@@ -64,6 +71,10 @@ const submit = () => {
                         autocomplete="new-password"
                         v-model="form.password_confirmation"
                         placeholder="Confirm password"
+                        inputClass="w-full"
+                        class="w-full"
+                        toggleMask
+                        :feedback="false"
                     />
                     <InputError :message="form.errors.password_confirmation" />
                 </div>
