@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import AuthBase from '@/layouts/AuthLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
+import Password from 'primevue/password'
+import InputText from 'primevue/inputtext';
 
 defineProps<{
     status?: string;
@@ -19,6 +21,7 @@ const form = useForm({
     password: '',
     remember: false,
 });
+
 
 const submit = () => {
     form.post(route('login'), {
@@ -41,7 +44,7 @@ const submit = () => {
             <div class="grid gap-6">
                 <div class="grid gap-2">
                     <Label for="username">Username</Label>
-                    <Input id="username" type="text" required autofocus :tabindex="1" autocomplete="username"
+                    <InputText id="username" type="text" required autofocus :tabindex="1" autocomplete="username"
                         v-model="form.username" placeholder="Username" />
                     <InputError :message="form.errors.username" />
                 </div>
@@ -54,8 +57,8 @@ const submit = () => {
                             Forgot password?
                         </TextLink>
                     </div>
-                    <Input id="password" type="password" required :tabindex="2" autocomplete="current-password"
-                        v-model="form.password" placeholder="Password" />
+                    <Password id="password" type="password" required :tabindex="2" autocomplete="current-password"
+                        v-model="form.password" placeholder="Password" inputClass="w-full" class="w-full" :feedback="false" toggleMask />
                     <InputError :message="form.errors.password" />
                 </div>
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
-
+import Password from 'primevue/password';
 // Components
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import InputError from '@/components/InputError.vue';
@@ -66,7 +66,7 @@ const closeModal = () => {
 
                         <div class="grid gap-2">
                             <Label for="password" class="sr-only">Password</Label>
-                            <Input id="password" type="password" name="password" ref="passwordInput" v-model="form.password" placeholder="Password" />
+                            <Password id="password" type="password" name="password" ref="passwordInput" v-model="form.password" placeholder="Password" :feedback="false" input-class="w-full"/>
                             <InputError :message="form.errors.password" />
                         </div>
 

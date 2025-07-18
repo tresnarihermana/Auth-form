@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { type BreadcrumbItem, type User } from '@/types';
+import InputText from 'primevue/inputtext';
 
 interface Props {
     mustVerifyEmail: boolean;
@@ -51,13 +52,13 @@ const submit = () => {
                 <form @submit.prevent="submit" class="space-y-6">
                     <div class="grid gap-2">
                         <Label for="username">Username</Label>
-                        <Input id="username" class="mt-1 block w-full" v-model="form.username" required autocomplete="username" placeholder="enter your username" />
+                        <InputText id="username" class="mt-1 block w-full" v-model="form.username" required autocomplete="username" placeholder="enter your username" />
                         <InputError class="mt-2" :message="form.errors.username" />
                     </div>
 
                     <div class="grid gap-2">
                         <Label for="email">Email address</Label>
-                        <Input
+                        <InputText
                             id="email"
                             type="email"
                             class="mt-1 block w-full"

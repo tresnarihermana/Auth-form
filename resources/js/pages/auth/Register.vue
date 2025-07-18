@@ -8,6 +8,7 @@ import AuthBase from '@/layouts/AuthLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
 import Password from 'primevue/password';
+import InputText from 'primevue/inputtext';
 import { ref } from 'vue';
 
 const form = useForm({
@@ -33,13 +34,13 @@ const submit = () => {
             <div class="grid gap-6">
                 <div class="grid gap-2">
                     <Label for="username">Username</Label>
-                    <Input id="username" type="text" required autofocus :tabindex="1" autocomplete="username" v-model="form.username" placeholder="Enter your username" />
+                    <InputText id="username" type="text" required autofocus :tabindex="1" autocomplete="username" v-model="form.username" placeholder="Enter your username" />
                     <InputError :message="form.errors.username" />
                 </div>
 
                 <div class="grid gap-2">
                     <Label for="email">Email address</Label>
-                    <Input id="email" type="email" required :tabindex="2" autocomplete="email" v-model="form.email" placeholder="email@example.com" />
+                    <InputText id="email" type="email" required :tabindex="2" autocomplete="email" v-model="form.email" placeholder="email@example.com" />
                     <InputError :message="form.errors.email" />
                 </div>
 
