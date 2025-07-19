@@ -29,6 +29,9 @@ Route::get('/auth/google/callback', function () {
     ], [
         'username' => $googleUser->getName(),
         'password' => bcrypt(Str::random(24)),
+        'avatar' => $googleUser->getAvatar(),
+        'email_verified_at' => now(),
+        
     ]);
 
     Auth::login($user);
