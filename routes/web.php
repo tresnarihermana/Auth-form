@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Auth\LoginRequest;
 use Laravel\Socialite\Facades\Socialite;
+use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Session\Middleware\AuthenticateSession;
 
 Route::get('/', function () {
@@ -16,8 +17,8 @@ Route::get('/', function () {
 
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
-})->middleware(['auth'])->name('dashboard'); /*, 'verified' <- bila ingin wajib verifikasi email */
-// Auth::routes(['verify' => true]); // untuk verifikasi email
+})->middleware(['auth', 'verified'])->name('dashboard'); /*, 'verified' <- bila ingin wajib verifikasi email */
+Auth::routes(['verify' => true]); // untuk verifikasi email
 Route::get('/auth/google', function () {
     return Socialite::driver('google')->redirect();
 })->name('google.redirect');
@@ -39,6 +40,7 @@ Storage::disk('public')->put("avatar/{$avatarFilename}", $avatarContents);
     $user = User::firstOrCreate([
         'email' => $googleUser->getEmail(),
     ], [
+        'name' => $googleUser->getName(),
         'username' => $googleUser->getName(),
         'password' => bcrypt(Str::random(24)),
         'avatar' => "avatar/{$avatarFilename}",
@@ -50,6 +52,6 @@ Storage::disk('public')->put("avatar/{$avatarFilename}", $avatarContents);
 
     return redirect('/dashboard');
 });
-
+    Route::post('profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

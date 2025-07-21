@@ -7,8 +7,8 @@ import { createApp, h } from 'vue';
 import { ZiggyVue } from 'ziggy-js';
 import { initializeTheme } from './composables/useAppearance';
 import PrimeVue from 'primevue/config';
-import Aura from '@primeuix/themes/aura';
-
+import Lara from '@primeuix/themes/lara';
+import '@primeuix/themes/lara';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -21,7 +21,8 @@ createInertiaApp({
             .use(ZiggyVue)
             .use(PrimeVue, {
                 theme: {
-                    preset: Aura,
+                    preset: Lara,
+                    
                 }
             })
             .mount(el);

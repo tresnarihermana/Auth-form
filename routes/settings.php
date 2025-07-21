@@ -19,5 +19,6 @@ Route::middleware('auth')->group(function () {
     Route::get('settings/appearance', function () {
         return Inertia::render('settings/Appearance');
     })->name('appearance');
+    // tambahan 
     Auth::routes(['verify' => true]);
 });

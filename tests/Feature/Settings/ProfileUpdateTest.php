@@ -18,7 +18,8 @@ test('profile information can be updated', function () {
     $response = $this
         ->actingAs($user)
         ->patch('/settings/profile', [
-            'username' => 'Test User',
+            'name'=>'Test User',
+            'username' => 'Test_User',
             'email' => 'test@example.com',
         ]);
 
@@ -27,8 +28,8 @@ test('profile information can be updated', function () {
         ->assertRedirect('/settings/profile');
 
     $user->refresh();
-
-    expect($user->username)->toBe('Test User');
+    expect($user->name)->toBe('Test User');
+    expect($user->username)->toBe('Test_User');
     expect($user->email)->toBe('test@example.com');
     expect($user->email_verified_at)->toBeNull();
 });
@@ -39,7 +40,7 @@ test('email verification status is unchanged when the email address is unchanged
     $response = $this
         ->actingAs($user)
         ->patch('/settings/profile', [
-            'username' => 'Test User',
+            'username' => 'Test_Uber',
             'email' => $user->email,
         ]);
 
@@ -56,7 +57,7 @@ test('user can delete their account', function () {
     $response = $this
         ->actingAs($user)
         ->delete('/settings/profile', [
-            'password' => 'password_2106',
+            'password' => 'Password_2106',
         ]);
 
     $response

@@ -16,7 +16,7 @@ defineProps<{
 }>();
 
 const form = useForm({
-    username: '',
+    login: '',
     password: '',
     remember: false,
 });
@@ -42,10 +42,10 @@ const submit = () => {
         <form @submit.prevent="submit" class="flex flex-col gap-6">
             <div class="grid gap-6">
                 <div class="grid gap-2">
-                    <Label for="username">Username</Label>
-                    <InputText id="username" type="text" required autofocus :tabindex="1" autocomplete="username"
-                        v-model="form.username" placeholder="Username" />
-                    <InputError :message="form.errors.username" />
+                    <Label for="login">Username atau Email</Label>
+                    <InputText id="login" type="text" required autofocus :tabindex="1"
+                        v-model="form.login" placeholder="Username / Email" />
+                    <InputError :message="form.errors.login" />
                 </div>
 
                 <div class="grid gap-2">
@@ -69,11 +69,11 @@ const submit = () => {
                 </div>
 
                 <Button type="submit" class="mt-4 w-full" :tabindex="4" :disabled="form.processing">
-                    <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
+                    <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin " />
                     Log in
                 </Button>
                 <div class="relative">
-                    <div class="text-center mb-2 text-base text-sm text-gray-900">OR</div>
+                    <div class="text-center mb-2 text-base text-sm text-gray-900 dark:text-white">OR</div>
                     <a href="/auth/google"
                         class="flex items-center justify-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100">
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="h-5 w-5" />
