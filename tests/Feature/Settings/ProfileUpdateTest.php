@@ -40,7 +40,8 @@ test('email verification status is unchanged when the email address is unchanged
     $response = $this
         ->actingAs($user)
         ->patch('/settings/profile', [
-            'username' => 'Test_Uber',
+            'name' => 'Test User',
+            'username' => 'Test_User',
             'email' => $user->email,
         ]);
 
