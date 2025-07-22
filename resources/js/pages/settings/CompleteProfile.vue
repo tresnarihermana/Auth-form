@@ -10,12 +10,8 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { type BreadcrumbItem, type User } from '@/types';
 import InputText from 'primevue/inputtext';
-import { Transition } from 'vue';
-// import FileUpload from 'primevue/fileupload';
-// import Avatar from 'primevue/avatar';
-// import { ref } from 'vue';
-// import axios from 'axios';
-// import toastr from 'toastr';
+import AuthBase from '@/layouts/AuthLayout.vue';
+import Password from 'primevue/password';
 
 
 
@@ -38,67 +34,30 @@ const page = usePage();
 const user = page.props.auth.user as User;
 
 const form = useForm({
-    name: user.name,
-    username: user.username,
+    name: '',
+    username: '',
+    password: '',
+    password_confirmation:'',
     email: user.email,
     avatar: user.avatar,
 });
 
 const submit = () => {
-    form.patch(route('profile.update'), {
+    form.patch(route('profile.complete'), {
         preserveScroll: true,
     });
 };
-// const fileInput = ref(null);
-// const openFileInput = () => {
-//     fileInput.value.click();
-// }
-
-// const profilePicture = ref(null);
-
-// const handleFileChange = (event) => {
-//     const file = event.target.files[0];
-//     profilePicture.value = URL.createObjectURL(file);
-//     const formData = new FormData();
-//     formData.append('avatar', file);
-//     axios.post('/profile/avatar', formData, {
-//         headers: {
-//             'Content-Type': 'multipart/form-data',
-//         }
-//     }).then(res => {
-//         form.avatar = res.data.avatar;
-//         toastr.success('Berhasil upload foto!');
-//     }).catch(err => {
-//         console.error(err);
-//         toastr.error('Gagal upload foto');
-//     });
-// }
  </script>
- <style>
- .profile-user-img {
-     cursor: pointer;
- }
-</style>
+
 
 <template>
-    <AppLayout :breadcrumbs="breadcrumbItems">
-
+      <AuthBase title="Complete Your Profile" description="Sebelum lanjut mohon isi dulu data diri anda">
         <Head title="Profile settings" />
 
-        <SettingsLayout>
             <div class="flex flex-col space-y-6">
-                <HeadingSmall title="Profile information" description="Update your name and email address" />
+                <HeadingSmall title="Profile information" description="Update your profile information" />
 
-                <form @submit.prevent="submit" class="space-y-6">
-                    <!-- <div class="grid gap-2">
-                        <Label for="avatar">Add Profile Photo</Label>
-                        <Avatar @click="openFileInput"
-                            :image="profilePicture ? profilePicture : `/storage/${user.avatar}`"
-                            class="mb-2 profile-user-img" size="xlarge" shape="circle" />
-                        <Input @change="handleFileChange" ref="fileInput" id="avatar" name="avatar"
-                            class="mt-1 block w-full" type="file" accept="image/*" />
-                        <InputError class="mt-2" :message="form.errors.avatar" />
-                    </div> -->
+                <form @submit.prevent="submit" class="space-y-6 flex flex-col">
                     <div class="grid gap-2">
                         <Label for="name">fullname</Label>
                         <InputText id="name" class="mt-1 block w-full" v-model="form.name" required
@@ -111,11 +70,45 @@ const submit = () => {
                             autocomplete="username" placeholder="enter your username" />
                         <InputError class="mt-2" :message="form.errors.username" />
                     </div>
+                <div class="grid gap-2 w-full">
+                    <Label for="password">Password</Label>
+                   <Password
+                    id="password"
+                    type="password"
+                    v-model="form.password"
+                    placeholder="Password"
+                    :tabindex="3"
+                    autocomplete="new-password"
+                    toggleMask
+                    inputClass="w-full" 
+                    class="w-full"
+                    />
+                    <InputError :message="form.errors.password" />
+                </div>
+                <div class="grid gap-2">
+                    <Label for="password_confirmation">Confirm password</Label>
+                    <Password
+                        id="password_confirmation"
+                        type="password"
+                        required
+                        :tabindex="4"
+                        autocomplete="new-password"
+                        v-model="form.password_confirmation"
+                        placeholder="Confirm password"
+                        inputClass="w-full"
+                        class="w-full"
+                        toggleMask
+                        :feedback="false"
+                    />
+                    <InputError :message="form.errors.password_confirmation" />
+                </div>
+
+
 
                     <div class="grid gap-2">
                         <Label for="email">Email address</Label>
                         <InputText id="email" type="email" class="mt-1 block w-full" v-model="form.email" required
-                            autocomplete="username" placeholder="Email address" />
+                            autocomplete="username" placeholder="Email address" disabled />
                         <InputError class="mt-2" :message="form.errors.email" />
                     </div>
 
@@ -143,8 +136,5 @@ const submit = () => {
                     </div>
                 </form>
             </div>
-
-            <DeleteUser />
-        </SettingsLayout>
-    </AppLayout>
+     </Authbase>
 </template>
