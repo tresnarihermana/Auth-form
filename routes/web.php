@@ -12,14 +12,15 @@ use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Session\Middleware\AuthenticateSession;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome');
+    return redirect('login');
+    
 })->name('home');
 Route::get('/CompleteProfile', function () {
     return Inertia::render('settings/CompleteProfile');
 })->middleware(['auth'])->name('complete.profile');
 Route::get('dashboard', function () {
-    return Inertia::render('Dashboard')->with('message' , 'Selamat datang');
-})->middleware(['auth' , 'verified'])->name('dashboard'); /*, 'verified' <- bila ingin wajib verifikasi email */
+    return Inertia::render('Dashboard')->with('message', 'Selamat datang');
+})->middleware(['auth', 'verified'])->name('dashboard'); /*, 'verified' <- bila ingin wajib verifikasi email */
 Auth::routes(['verify' => true]); // untuk verifikasi email
 Route::get('/auth/google', function () {
     return Socialite::driver('google')->redirect();
@@ -27,21 +28,24 @@ Route::get('/auth/google', function () {
 
 Route::get('/auth/google/callback', function () {
     $googleUser = Socialite::driver('google')->stateless()->user();
-$avatarUrl = $googleUser->getAvatar();
+    // $avatarUrl = $googleUser->getAvatar();
 
-// Ambil ekstensi file dari URL
-$path = parse_url($avatarUrl, PHP_URL_PATH);
-$ext = pathinfo($path, PATHINFO_EXTENSION) ?: 'jpg'; // default ke jpg kalau kosong
+    // // Ambil ekstensi file dari URL
+    // $path = parse_url($avatarUrl, PHP_URL_PATH);
+    // $ext = pathinfo($path, PATHINFO_EXTENSION) ?: 'jpg'; // default ke jpg kalau kosong
 
-$avatarFilename = 'avatar_' . Str::random(20) . '.' . $ext;
+    // $avatarFilename = 'avatar_' . Str::random(20) . '.' . $ext;
 
-$avatarContents = file_get_contents($avatarUrl);
-Storage::disk('public')->makeDirectory('avatar');
-Storage::disk('public')->put("avatar/{$avatarFilename}", $avatarContents);
+    // $avatarContents = file_get_contents($avatarUrl);
+    // Storage::disk('public')->makeDirectory('avatar');
+    // Storage::disk('public')->put("avatar/{$avatarFilename}", $avatarContents);
 
-    $user = User::firstOrCreate([
-        'email' => $googleUser->getEmail(),
-    ]);
+    $user = User::firstOrCreate(
+        [
+            'email' => $googleUser->getEmail(),
+        ]
+
+    );
 
 
     Auth::login($user);
@@ -51,10 +55,9 @@ Storage::disk('public')->put("avatar/{$avatarFilename}", $avatarContents);
     }
 
     return redirect('/dashboard')->with("message", "Selamat datang");
-
 });
 
 
-    Route::post('profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
+Route::post('profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

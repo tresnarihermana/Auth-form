@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
 
 class ProfileController extends Controller
@@ -61,11 +62,16 @@ class ProfileController extends Controller
 
         return redirect('/');
     }
-    public function updateAvatar(Request $request)
-    {
-       if ($request->hasFile('avatar')) {
-           $link = Storage::disk('public')->putFile('avatars', $request->file('avatar'));
-           dd($link);
-       }
+    
+public function updateAvatar(Request $request): RedirectResponse
+{
+    if ($request->hasFile('avatar')) {
+        $link = Storage::disk('public')->putFile('avatar', $request->file('avatar'));
+        $user = $request->user();
+        $user->avatar = $link;
+        $user->save();
+        return redirect()->back();
     }
+    return redirect()->back();
+}
 }
