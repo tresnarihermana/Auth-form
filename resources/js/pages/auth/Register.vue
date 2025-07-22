@@ -10,6 +10,7 @@ import Password from 'primevue/password';
 import InputText from 'primevue/inputtext';
 
 const form = useForm({
+    name: '',
     username: '',
     email: '',
     password: '',
@@ -29,6 +30,11 @@ const submit = () => {
 
         <form @submit.prevent="submit" class="flex flex-col gap-6">
             <div class="grid gap-6">
+                <div class="grid gap-2">
+                    <Label for="name">Fullname</Label>
+                    <InputText id="name" type="text" required autofocus :tabindex="1" autocomplete="fullname" v-model="form.name" placeholder="Enter your fullname" />
+                    <InputError :message="form.errors.name" />
+                </div>
                 <div class="grid gap-2">
                     <Label for="username">Username</Label>
                     <InputText id="username" type="text" required autofocus :tabindex="1" autocomplete="username" v-model="form.username" placeholder="Enter your username" />

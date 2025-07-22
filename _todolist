@@ -18,3 +18,9 @@ To-do list:
 
 Easy way:
 Ganti form full name jadi username ✅
+
+to do list:
+1. ubah field username agar bisa menerima email dan username pada form login ✅
+2. tambah pop up verfikasi email pada saat register maupun oauth ✅
+3. tambah field fullname di register ✅
+4. 

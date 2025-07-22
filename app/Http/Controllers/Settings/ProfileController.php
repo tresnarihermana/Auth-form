@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\Settings;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Settings\ProfileUpdateRequest;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Http\Requests\Settings\ProfileUpdateRequest;
 
 class ProfileController extends Controller
 {
@@ -36,8 +38,8 @@ class ProfileController extends Controller
         }
 
         $request->user()->save();
-
         return to_route('profile.edit');
+        
     }
 
     /**
@@ -46,7 +48,7 @@ class ProfileController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         $request->validate([
-            'password' => ['required', 'current_password'],
+            'password' => ['required', 'current_password','regex:/^[a-zA-Z0-9_]+$/'],
         ]);
 
         $user = $request->user();
@@ -60,4 +62,16 @@ class ProfileController extends Controller
 
         return redirect('/');
     }
+    
+public function updateAvatar(Request $request): RedirectResponse
+{
+    if ($request->hasFile('avatar')) {
+        $link = Storage::disk('public')->putFile('avatar', $request->file('avatar'));
+        $user = $request->user();
+        $user->avatar = $link;
+        $user->save();
+        return redirect()->back();
+    }
+    return redirect()->back();
+}
 }

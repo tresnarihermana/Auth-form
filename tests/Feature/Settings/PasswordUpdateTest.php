@@ -10,16 +10,16 @@ test('password can be updated', function () {
         ->actingAs($user)
         ->from('/settings/password')
         ->put('/settings/password', [
-            'current_password' => 'password_2106',
-            'password' => 'new-password123',
-            'password_confirmation' => 'new-password123',
+            'current_password' => 'Password_2106',
+            'password' => 'New-Password123',
+            'password_confirmation' => 'New-Password123',
         ]);
 
     $response
         ->assertSessionHasNoErrors()
         ->assertRedirect('/settings/password');
 
-    expect(Hash::check('new-password123', $user->refresh()->password))->toBeTrue();
+    expect(Hash::check('New-Password123', $user->refresh()->password))->toBeTrue();
 });
 
 test('correct password must be provided to update password', function () {
