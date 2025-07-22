@@ -1,3 +1,4 @@
+@include('sweetalert2::index')
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}"  @class(['dark' => ($appearance ?? 'system') == 'dark'])>
     <head>

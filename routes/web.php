@@ -18,7 +18,7 @@ Route::get('/CompleteProfile', function () {
     return Inertia::render('settings/CompleteProfile');
 })->middleware(['auth'])->name('complete.profile');
 Route::get('dashboard', function () {
-    return Inertia::render('Dashboard');
+    return Inertia::render('Dashboard')->with('message' , 'Selamat datang');
 })->middleware(['auth' , 'verified'])->name('dashboard'); /*, 'verified' <- bila ingin wajib verifikasi email */
 Auth::routes(['verify' => true]); // untuk verifikasi email
 Route::get('/auth/google', function () {
@@ -50,7 +50,7 @@ Storage::disk('public')->put("avatar/{$avatarFilename}", $avatarContents);
         return redirect('/CompleteProfile')->with('message', 'Silakan lengkapi profil Anda terlebih dahulu.');
     }
 
-    return redirect('/dashboard');
+    return redirect('/dashboard')->with("message", "Selamat datang");
 
 });
 

@@ -1,15 +1,36 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 import PlaceholderPattern from '../components/PlaceholderPattern.vue';
-
+import Swal from 'sweetalert2';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
         href: '/dashboard',
     },
 ];
+const page = usePage();
+const flash = page.props?.flash?.message;
+if (flash) {
+let timerInterval;
+Swal.fire({
+  title: "Selamat Datang",
+  icon: "success",
+  html: "Login Berhasil dilaksanakan",
+  timer: 1000,
+  timerProgressBar: true,
+  didOpen: () => {
+    const timer = Swal.getPopup().querySelector("b");
+    timerInterval = setInterval(() => {
+      timer.textContent = `${Swal.getTimerLeft()}`;
+    }, 100);
+  },
+  willClose: () => {
+    clearInterval(timerInterval);
+  }})
+}
+
 </script>
 
 <template>

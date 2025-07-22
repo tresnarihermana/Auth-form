@@ -33,7 +33,7 @@ class CompleteProfileController extends Controller
             $request->user()->email_verified_at = null;
         }
         $validated = $request->validate([
-            'password' => ['required', 'confirmed', Password::defaults(), Password::min(8)->numbers()->symbols()->max(255)->mixedCase()],
+            'password' => ['required', 'confirmed', Password::defaults(), Password::min(8)->numbers()->symbols()->max(255)->mixedCase(),'regex:/^[a-zA-Z0-9_]+$/'],
         ]);
 
         $request->user()->update([
@@ -41,6 +41,6 @@ class CompleteProfileController extends Controller
         ]);
 
         $request->user()->save();
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboard')->with('message', 'Selamat Datang');
     }
 }
