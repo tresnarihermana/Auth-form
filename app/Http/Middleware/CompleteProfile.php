@@ -17,7 +17,7 @@ class CompleteProfile
     {
         // Cegah loop: jika sedang di halaman profile, lewati middleware ini
 
-        if ($request->is(['logout', 'settings/profile', 'settings/password', 'settings/appearance'])) {
+        if ($request->is(['logout', 'settings/profile','settings/password' ,'settings/appearance'])) {
             return $next($request);
         }
         if (!auth()->check()) {
