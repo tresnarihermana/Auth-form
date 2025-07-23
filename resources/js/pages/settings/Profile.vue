@@ -12,10 +12,14 @@ import { type BreadcrumbItem, type User } from '@/types';
 import InputText from 'primevue/inputtext';
 import { Transition } from 'vue';
 import FileUpload from 'primevue/fileupload';
-import { ref } from 'vue';
+import { onBeforeMount, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { computed } from 'vue';
 import { useInitials } from '@/composables/useInitials';
+import Swal from 'sweetalert2';
+import { router } from '@inertiajs/vue3';
+import { SIDEBAR_WIDTH_MOBILE } from '../../components/ui/sidebar/utils';
+
 
 const props = defineProps<Props>();
 
@@ -44,6 +48,21 @@ const form = useForm({
 const submit = () => {
     form.patch(route('profile.update'), {
         preserveScroll: true,
+        onSuccess: () => {
+            Swal.fire({
+                title: "Process Success",
+                text: "Profile Berhasil Diperbarui",
+                icon: "success",
+                
+            });
+        },
+        onError: () => {
+            Swal.fire({
+                title: "Process Failed",
+                text: "Profile Gagal Diperbarui",
+                icon: "error"
+            });
+        }
     });
 };
 
@@ -65,7 +84,72 @@ const updateProfilePhoto = () => {
         },
     });
 }
+const usernameWarning = ref('');
+watch(() => form.username, (val) => {
+    if (/\s/.test(val)) {
+        usernameWarning.value = 'Username field cannot use spaces'
+    } else {
+        usernameWarning.value = ''
+    }
+})
+const flash = page.props?.flash?.message;
+if (flash || !user.username || !user.name) {
+    Swal.fire({
+        icon: "info",
+        title: "Complete Your Profile",
+        text: "Please Complete your Profile info before proceed",
+    });
+}
 
+// watch(form, () => {
+//     isDirty.value = true;
+// }, { deep: true });
+// const isDirty = ref(false);
+// onMounted(() => {
+//     console.log('[DEBUG] onMounted called');
+//     window.addEventListener('beforeunload', function(){
+//         // return   Swal.fire({
+//         //         title: 'Perubahan belum disimpan',
+//         //         text: 'Yakin ingin meninggalkan halaman ini?',
+//         //         icon: 'warning',
+//         //         showCancelButton: true,
+//         //         confirmButtonText: 'Ya, tinggalkan',
+//         //         cancelButtonText: 'Batal',
+//             })
+//     });
+
+//     router.on('before', (event) => {
+
+//         if (isDirty.value) {
+//             event.preventDefault();
+
+//             Swal.fire({
+//                 title: 'Harap isi form yang ada',
+//                 text: 'Sebelum melajutkan harap isi form yang ada',
+//                 icon: 'warning',
+//                 showCancelButton: true,
+//                 confirmButtonText: 'Ya, tinggalkan',
+//                 cancelButtonText: 'Batal',
+//             }).then((result) => {
+//                 if (result.isConfirmed) {
+//                     isDirty.value = false;
+//                     router.visit('/settings/profile',{
+//                         preserveScroll: true,
+//                         preserveState: true,
+//                     });
+//                 }
+//             });
+//         }
+//     });
+// });
+
+
+
+
+
+// onBeforeUnmount(() => {
+//     window.removeEventListener('beforeunload', handleBeforeUnload);
+// });
 </script>
 <style>
 .profile-user-img {
@@ -79,23 +163,21 @@ const updateProfilePhoto = () => {
         <Head title="Profile settings" />
 
         <SettingsLayout>
+            <Link href="/settings/password">Ganti Password</Link>
+
             <div class="flex flex-col space-y-6">
                 <HeadingSmall title="Profile information" description="Update your name and email address" />
-                        <div class="mt-6">
-            <h2 class="text-lg font-medium text-gray-900">Foto Profil</h2>
-            <p class="mt-1 text-sm text-gray-600">
-                Unggah atau perbarui foto profil Anda.
-            </p>
-        </div>
-            <div class="mt-4">
-                <img
-                    v-if="user.avatar || photoPreview"
-                    :src="photoPreview || '/storage/' + user.avatar"
-                    alt="Foto Profil"
-                    class="w-32 h-32 rounded-full object-cover"
-                />
-                <p v-else class="text-gray-500">Belum ada foto profil.</p>
-            </div>
+                <div class="mt-6">
+                    <h2 class="text-lg font-medium text-gray-900">Foto Profil</h2>
+                    <p class="mt-1 text-sm text-gray-600">
+                        Unggah atau perbarui foto profil Anda.
+                    </p>
+                </div>
+                <div class="mt-4">
+                    <img v-if="user.avatar || photoPreview" :src="photoPreview || '/storage/' + user.avatar"
+                        alt="Foto Profil" class="w-32 h-32 rounded-full object-cover" />
+                    <p v-else class="text-gray-500">Belum ada foto profil.</p>
+                </div>
 
                 <form @submit.prevent="updateProfilePhoto" class="mt-4 space-y-4">
                     <div>
@@ -120,7 +202,7 @@ const updateProfilePhoto = () => {
                     <div class="grid gap-2">
                         <Label for="name">fullname</Label>
                         <InputText id="name" class="mt-1 block w-full" v-model="form.name" required autocomplete="name"
-                            placeholder="enter your fullname" />
+                            autofocus="true" placeholder="enter your fullname" />
                         <InputError class="mt-2" :message="form.errors.name" />
                     </div>
                     <div class="grid gap-2">
@@ -128,6 +210,9 @@ const updateProfilePhoto = () => {
                         <InputText id="username" class="mt-1 block w-full" v-model="form.username" required
                             autocomplete="username" placeholder="enter your username" />
                         <InputError class="mt-2" :message="form.errors.username" />
+                        <p v-if="usernameWarning" class="text-sm text-red-600 mt-1">
+                            {{ usernameWarning }}
+                        </p>
                     </div>
 
                     <div class="grid gap-2">

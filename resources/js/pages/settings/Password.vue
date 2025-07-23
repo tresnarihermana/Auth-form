@@ -1,15 +1,16 @@
+
 <script setup lang="ts">
 import InputError from '@/components/InputError.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type User } from '@/types';
 import Password from 'primevue/password';
-
+import Swal from 'sweetalert2';
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
@@ -17,21 +18,34 @@ const breadcrumbItems: BreadcrumbItem[] = [
         href: '/settings/password',
     },
 ];
+const page = usePage();
 
 const passwordInput = ref<HTMLInputElement | null>(null);
 const currentPasswordInput = ref<HTMLInputElement | null>(null);
-
+const user = page.props.auth.user as User;
 const form = useForm({
-    current_password: '',
     password: '',
     password_confirmation: '',
+    current_password: '',
 });
 
 const updatePassword = () => {
     form.put(route('setting.password.update'), {
         preserveScroll: true,
-        onSuccess: () => form.reset(),
+        onSuccess: () => {form.reset()
+            Swal.fire({
+                title: "Process Success",
+                text: "Password Berhasil Diperbarui",
+                icon: "success"
+            });
+        },
         onError: (errors: any) => {
+            Swal.fire({
+                title: "Process Failed",
+                text: "Password Gagal Diperbarui",
+                icon: "error"
+                
+            });
             if (errors.password) {
                 form.reset('password', 'password_confirmation');
                 if (passwordInput.value instanceof HTMLInputElement) {
@@ -48,6 +62,19 @@ const updatePassword = () => {
         },
     });
 };
+const IsNewUser = ref(false);
+const flash = page.props?.flash?.message;
+if(!user.has_password || flash){
+    IsNewUser.value = true;
+    Swal.fire({
+  icon: "info",
+  title: "Complete Your Password",
+  text: "Please Complete your Password info before proceed",
+});
+}else{
+    IsNewUser.value = false;
+}
+
 </script>
 
 <template>
@@ -59,7 +86,7 @@ const updatePassword = () => {
                 <HeadingSmall title="Update password" description="Ensure your account is using a long, random password to stay secure" />
 
                 <form @submit.prevent="updatePassword" class="space-y-6">
-                    <div class="grid gap-2">
+                    <div class="grid gap-2" v-if="!IsNewUser">
                         <Label for="current_password">Current password</Label>
                         <Password
                             id="current_password"

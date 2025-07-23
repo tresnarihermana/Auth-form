@@ -30,6 +30,7 @@ export interface User {
     username: string;
     name: string;
     email: string;
+    has_password: boolean;
     avatar?: string;
     email_verified_at: string | null;
     created_at: string;
