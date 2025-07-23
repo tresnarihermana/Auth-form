@@ -10,7 +10,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Session\Middleware\AuthenticateSession;
-
+use App\Http\Middleware\CompleteProfile;
 Route::get('/', function () {
     return redirect('login');
     
@@ -50,9 +50,9 @@ Route::get('/auth/google/callback', function () {
 
     Auth::login($user);
 
-    if (!$user->username || !$user->name || !$user->password) {
-        return redirect('/CompleteProfile')->with('message', 'Silakan lengkapi profil Anda terlebih dahulu.');
-    }
+    // if (!$user->username || !$user->name || !$user->password) {
+    //     return redirect('/settings/profile')->with('message', 'Silakan lengkapi profil Anda terlebih dahulu.');
+    // }
 
     return redirect('/dashboard')->with("message", "Selamat datang");
 });
