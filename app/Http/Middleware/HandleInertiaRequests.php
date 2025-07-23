@@ -2,10 +2,11 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
+use Illuminate\Http\Request;
+use Illuminate\Foundation\Inspiring;
+use Illuminate\Support\Facades\Auth;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -47,7 +48,18 @@ class HandleInertiaRequests extends Middleware
             ],
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
+                'user' => function () {
+                    $user = Auth::user();
+                    return $user ? [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'username' => $user->username,
+                        'email' => $user->email,
+                        'avatar' => $user->avatar,
+                        'email_verified_at' => $user->email_verified_at,
+                        'has_password' => !is_null($user->password),
+                    ] : null;
+                }
             ],
             'ziggy' => [
                 ...(new Ziggy)->toArray(),
