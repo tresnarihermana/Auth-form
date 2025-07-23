@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Settings;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Validation\Rules\Password;
 
 class PasswordController extends Controller
 {
@@ -25,8 +26,13 @@ class PasswordController extends Controller
      */
     public function update(Request $request): RedirectResponse
     {
+        if(Auth::user()->password === null){
+            $currentPasswordRule = ['nullable'];
+        }else{
+            $currentPasswordRule =   ['required', 'current_password','regex:/^[a-zA-Z0-9_]+$/'];
+        }
         $validated = $request->validate([
-            'current_password' => ['required', 'current_password','regex:/^[a-zA-Z0-9_]+$/'],
+            'current_password' => $currentPasswordRule,
             'password' => ['required', Password::defaults(), 'confirmed', Password::min(8)->numbers()->symbols(), 'max:255' ,'regex:/^[a-zA-Z0-9_]+$/'],
         ]);
 
