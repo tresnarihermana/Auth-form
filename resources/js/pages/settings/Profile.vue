@@ -93,7 +93,7 @@ watch(() => form.username, (val) => {
     }
 })
 const flash = page.props?.flash?.message;
-if (flash) {
+if (flash || !user.username || !user.name) {
     Swal.fire({
         icon: "info",
         title: "Complete Your Profile",
