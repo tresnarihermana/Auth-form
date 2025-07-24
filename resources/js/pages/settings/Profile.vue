@@ -17,9 +17,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { computed } from 'vue';
 import { useInitials } from '@/composables/useInitials';
 import Swal from 'sweetalert2';
-import { router } from '@inertiajs/vue3';
-import { SIDEBAR_WIDTH_MOBILE } from '../../components/ui/sidebar/utils';
-
 
 const props = defineProps<Props>();
 
@@ -53,7 +50,7 @@ const submit = () => {
                 title: "Process Success",
                 text: "Profile Berhasil Diperbarui",
                 icon: "success",
-                
+
             });
         },
         onError: () => {
@@ -150,6 +147,10 @@ if (flash || !user.username || !user.name) {
 // onBeforeUnmount(() => {
 //     window.removeEventListener('beforeunload', handleBeforeUnload);
 // });
+const { getInitials } = useInitials();
+
+// Compute whether we should show the avatar image
+const showAvatar = computed(() => props.user.avatar && props.user.avatar !== '');
 </script>
 <style>
 .profile-user-img {
@@ -174,9 +175,13 @@ if (flash || !user.username || !user.name) {
                     </p>
                 </div>
                 <div class="mt-4">
-                    <img v-if="user.avatar || photoPreview" :src="photoPreview || '/storage/' + user.avatar"
+                    <Avatar class="w-32 h-32 rounded-full object-cover">
+                        <AvatarImage v-if="user.avatar || photoPreview" :src="photoPreview || '/storage/' + user.avatar"
                         alt="Foto Profil" class="w-32 h-32 rounded-full object-cover" />
-                    <p v-else class="text-gray-500">Belum ada foto profil.</p>
+                        <AvatarFallback class="rounded-lg text-black dark:text-white">
+                            {{ getInitials(user.username) }}
+                        </AvatarFallback>
+                    </Avatar>
                 </div>
 
                 <form @submit.prevent="updateProfilePhoto" class="mt-4 space-y-4">
