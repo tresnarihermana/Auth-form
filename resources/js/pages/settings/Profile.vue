@@ -59,7 +59,7 @@ const submit = () => {
         onError: () => {
             Swal.fire({
                 title: "Process Failed",
-                text: "Profile Gagal Diperbarui",
+                text: form.errors.email ?? form.errors.name ?? form.errors.username,
                 icon: "error"
             });
         }
@@ -209,10 +209,10 @@ if (flash || !user.username || !user.name) {
                         <Label for="username">Username</Label>
                         <InputText id="username" class="mt-1 block w-full" v-model="form.username" required
                             autocomplete="username" placeholder="enter your username" />
-                        <InputError class="mt-2" :message="form.errors.username" />
-                        <p v-if="usernameWarning" class="text-sm text-red-600 mt-1">
+                        <InputError class="mt-2" :message="form.errors.username ?? usernameWarning" />
+                        <!-- <p v-if="usernameWarning" class="text-sm text-red-600 mt-1">
                             {{ usernameWarning }}
-                        </p>
+                        </p> -->
                     </div>
 
                     <div class="grid gap-2">

@@ -42,7 +42,7 @@ const updatePassword = () => {
         onError: (errors: any) => {
             Swal.fire({
                 title: "Process Failed",
-                text: "Password Gagal Diperbarui",
+                text: form.errors.current_password ?? form.errors.password ?? form.errors.password_confirmation,
                 icon: "error"
                 
             });
