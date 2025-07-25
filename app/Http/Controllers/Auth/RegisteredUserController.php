@@ -35,7 +35,7 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|regex:/^[a-zA-Z0-9_]+$/|unique:'.User::class,
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'password' => ['required', 'confirmed', Rules\Password::defaults(), Password::min(8)->numbers()->symbols()->max(255)->mixedCase(),'regex:/^[a-zA-Z0-9_]+$/'],
+            'password' => ['required', 'confirmed', Rules\Password::defaults(), Password::min(8)->numbers()->symbols()->max(255)->mixedCase(),'regex:/^[A-Za-z\d\W_]+$/'],
         ], [
             'name.required' => 'Name is required.',
             'username.unique' => 'Username is already taken.',
@@ -54,8 +54,8 @@ class RegisteredUserController extends Controller
         ]);
 
         event(new Registered($user));
-        Auth::login($user);
-
-        return to_route('dashboard')->with('message', 'selamat datang');
+        // Auth::login($user);
+        session(['message' => 'verify email']);
+        return to_route('login');
     }
 }
