@@ -25,7 +25,10 @@ Auth::routes(['verify' => true]); // untuk verifikasi email
 Route::get('/auth/google', function () {
     return Socialite::driver('google')->redirect();
 })->name('google.redirect');
-
+Route::get('/clear-message', function () {
+    session()->forget('message');
+    return redirect()->back();
+});
 Route::get('/auth/google/callback', function () {
     $googleUser = Socialite::driver('google')->stateless()->user();
     // $avatarUrl = $googleUser->getAvatar();
