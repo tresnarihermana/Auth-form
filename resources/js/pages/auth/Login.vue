@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import AuthBase from '@/layouts/AuthLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
 import Password from 'primevue/password'
 import InputText from 'primevue/inputtext';
+import Swal from 'sweetalert2';
 
 defineProps<{
     status?: string;
@@ -27,7 +28,28 @@ const submit = () => {
         onFinish: () => form.reset('password'),
     });
 };
+const page = usePage();
+const session = page.props?.session?.message;
+if (session) {
+   Swal.fire({
+  title: 'Verified Your Email',
+  html: `
+    <p>Silakan cek email kamu untuk verifikasi akun.</p>
+  `,
+  icon: 'info',
+  allowOutsideClick: false,
+  allowEscapeKey: false,
+  showCancelButton: false,
+  confirmButtonText: 'Saya sudah verifikasi',
+}).then((result) => {
+  if (result.isConfirmed) {
+    // Arahkan ke halaman pengecekan status verifikasi atau reload
+    window.location.href='/clear-message';
+  }
+});
+}
 </script>
+
 
 <template>
     <AuthBase title="Log in to your account" description="Enter your username and password below to log in">
