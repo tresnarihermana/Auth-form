@@ -147,6 +147,10 @@ if (flash || !user.username || !user.name) {
 // onBeforeUnmount(() => {
 //     window.removeEventListener('beforeunload', handleBeforeUnload);
 // });
+const fileInput = ref(null);
+const openFileInput = () => {
+    fileInput.value.click();
+}
 const { getInitials } = useInitials();
 
 // Compute whether we should show the avatar image
@@ -177,7 +181,7 @@ const showAvatar = computed(() => props.user.avatar && props.user.avatar !== '')
                 <div class="mt-4">
                     <Avatar class="w-32 h-32 rounded-full object-cover">
                         <AvatarImage v-if="user.avatar || photoPreview" :src="photoPreview || '/storage/' + user.avatar"
-                        alt="Foto Profil" class="w-32 h-32 rounded-full object-cover" />
+                        alt="Foto Profil" class="w-32 h-32 rounded-full object-cover profile-user-img" @click = "openFileInput" />
                         <AvatarFallback class="rounded-lg text-black dark:text-white">
                             {{ getInitials(user.username) }}
                         </AvatarFallback>
@@ -187,7 +191,7 @@ const showAvatar = computed(() => props.user.avatar && props.user.avatar !== '')
                 <form @submit.prevent="updateProfilePhoto" class="mt-4 space-y-4">
                     <div>
                         <Input for="avatar" value="Pilih Foto" />
-                        <input id="avatar" type="file" accept="image/*" class="mt-1 block w-full"
+                        <input ref="fileInput" id="avatar" type="file" accept="image/*" class="mt-1 block w-full"
                             @change="selectNewPhoto" />
                         <InputError class="mt-2" :message="form.errors.avatar" />
                     </div>
