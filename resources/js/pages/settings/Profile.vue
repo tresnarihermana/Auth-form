@@ -11,22 +11,17 @@ import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { type BreadcrumbItem, type User } from '@/types';
 import InputText from 'primevue/inputtext';
 import { Transition } from 'vue';
-import FileUpload from 'primevue/fileupload';
-import { onBeforeMount, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import {ref, watch } from 'vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { computed } from 'vue';
 import { useInitials } from '@/composables/useInitials';
 import Swal from 'sweetalert2';
-import { router } from '@inertiajs/vue3';
-import { SIDEBAR_WIDTH_MOBILE } from '../../components/ui/sidebar/utils';
-
 
 const props = defineProps<Props>();
 
 interface Props {
     mustVerifyEmail: boolean;
     status?: string;
-    user: User;
 }
 const breadcrumbItems: BreadcrumbItem[] = [
     {
@@ -53,13 +48,13 @@ const submit = () => {
                 title: "Process Success",
                 text: "Profile Berhasil Diperbarui",
                 icon: "success",
-                
+
             });
         },
         onError: () => {
             Swal.fire({
                 title: "Process Failed",
-                text: "Profile Gagal Diperbarui",
+                text: form.errors.email ?? form.errors.name ?? form.errors.username,
                 icon: "error"
             });
         }
@@ -150,6 +145,14 @@ if (flash || !user.username || !user.name) {
 // onBeforeUnmount(() => {
 //     window.removeEventListener('beforeunload', handleBeforeUnload);
 // });
+const fileInput = ref(null);
+const openFileInput = () => {
+    fileInput.value.click();
+}
+const { getInitials } = useInitials();
+
+// Compute whether we should show the avatar image
+// const showAvatar = computed(() => props.user.avatar && props.user.avatar !== '');
 </script>
 <style>
 .profile-user-img {
@@ -174,15 +177,19 @@ if (flash || !user.username || !user.name) {
                     </p>
                 </div>
                 <div class="mt-4">
-                    <img v-if="user.avatar || photoPreview" :src="photoPreview || '/storage/' + user.avatar"
-                        alt="Foto Profil" class="w-32 h-32 rounded-full object-cover" />
-                    <p v-else class="text-gray-500">Belum ada foto profil.</p>
+                    <Avatar class="w-32 h-32 rounded-full object-cover">
+                        <AvatarImage v-if="user.avatar || photoPreview" :src="photoPreview || '/storage/' + user.avatar"
+                        alt="Foto Profil" class="w-32 h-32 rounded-full object-cover profile-user-img" @click = "openFileInput" />
+                        <AvatarFallback class="rounded-lg text-black dark:text-white">
+                            {{ getInitials(user.username) }}
+                        </AvatarFallback>
+                    </Avatar>
                 </div>
 
                 <form @submit.prevent="updateProfilePhoto" class="mt-4 space-y-4">
                     <div>
                         <Input for="avatar" value="Pilih Foto" />
-                        <input id="avatar" type="file" accept="image/*" class="mt-1 block w-full"
+                        <input ref="fileInput" id="avatar" type="file" accept="image/*" class="mt-1 block w-full"
                             @change="selectNewPhoto" />
                         <InputError class="mt-2" :message="form.errors.avatar" />
                     </div>
@@ -209,10 +216,10 @@ if (flash || !user.username || !user.name) {
                         <Label for="username">Username</Label>
                         <InputText id="username" class="mt-1 block w-full" v-model="form.username" required
                             autocomplete="username" placeholder="enter your username" />
-                        <InputError class="mt-2" :message="form.errors.username" />
-                        <p v-if="usernameWarning" class="text-sm text-red-600 mt-1">
+                        <InputError class="mt-2" :message="form.errors.username ?? usernameWarning" />
+                        <!-- <p v-if="usernameWarning" class="text-sm text-red-600 mt-1">
                             {{ usernameWarning }}
-                        </p>
+                        </p> -->
                     </div>
 
                     <div class="grid gap-2">

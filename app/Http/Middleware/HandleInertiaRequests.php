@@ -46,6 +46,9 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'message' => session('message')
             ],
+            'session' => [
+                'message' => session('message')
+            ],
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => function () {

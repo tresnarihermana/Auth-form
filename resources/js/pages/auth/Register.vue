@@ -8,30 +8,81 @@ import { Head, useForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
 import Password from 'primevue/password';
 import InputText from 'primevue/inputtext';
-import { watch, ref } from 'vue';
-import { User } from '../../types/index';
-
+import { reactive, watch, ref, onMounted } from 'vue';
+import Divider from 'primevue/divider';
+import Swal from 'sweetalert2';
 const form = useForm({
     name: '',
     username: '',
     email: '',
     password: '',
     password_confirmation: '',
+    'g-recaptcha-response': '',
 });
 
 const submit = () => {
-    form.post(route('register'), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
+  const token = grecaptcha.getResponse();
+  if (!token) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Oops!',
+      text: 'Harap centang reCAPTCHA terlebih dahulu!',
     });
+    return;
+  }
+
+form['g-recaptcha-response'] = token;
+
+
+  form.post(route('register'), {
+    onError: (errors) => {
+      console.log(errors);
+    },
+    onFinish: () => {
+      grecaptcha.reset(); // reset captcha biar bisa dicentang lagi
+    },
+  });
 };
+
 const usernameWarning = ref('');
 watch(() => form.username, (val) => {
-    if(/\s/.test(val)){
+    if (/\s/.test(val)) {
         usernameWarning.value = 'Username field cannot use spaces'
-    } else{
+    } else {
         usernameWarning.value = ''
     }
 })
+// realtime validate password
+const rules = reactive({
+    minLength: false,
+    hasUppercase: false,
+    hasLowercase: false,
+    hasNumber: false,
+    hasSymbol: false
+})
+function validatePassword() {
+    const val = form.password
+
+    rules.minLength = val.length >= 8
+    rules.hasUppercase = /[A-Z]/.test(val)
+    rules.hasLowercase = /[a-z]/.test(val)
+    rules.hasNumber = /[0-9]/.test(val)
+    rules.hasSymbol = /[^A-Za-z0-9]/.test(val)
+}
+watch(() => form.password, validatePassword)
+onMounted(() => {
+    const recaptchaScriptId = 'recaptcha-script';
+
+    if (!document.getElementById(recaptchaScriptId)) {
+        const script = document.createElement('script');
+        script.id = recaptchaScriptId;
+        script.src = 'https://www.google.com/recaptcha/api.js';
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+    }
+});
+const sitekey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 </script>
 
 <template>
@@ -51,10 +102,7 @@ watch(() => form.username, (val) => {
                     <Label for="username">Username</Label>
                     <InputText id="username" type="text" required autofocus :tabindex="1" autocomplete="username"
                         v-model="form.username" placeholder="Enter your username" />
-                    <InputError :message="form.errors.username" />
-                    <p v-if="usernameWarning" class="text-sm text-red-600 mt-1">
-                        {{ usernameWarning }}
-                    </p>
+                    <InputError :message="form.errors.username ?? usernameWarning" />
 
                 </div>
 
@@ -68,7 +116,18 @@ watch(() => form.username, (val) => {
                 <div class="grid gap-2 w-full">
                     <Label for="password">Password</Label>
                     <Password id="password" type="password" v-model="form.password" placeholder="Password" :tabindex="3"
-                        autocomplete="new-password" toggleMask inputClass="w-full" class="w-full" />
+                        autocomplete="new-password" toggleMask inputClass="w-full" class="w-full">
+                        <template #footer>
+                            <Divider />
+                            <ul class="pl-2 my-0 leading-normal text-sm">
+                                <li v-if="!rules.minLength">Password minimal 8 karakter</li>
+                                <li v-if="!rules.hasUppercase">Harus ada huruf besar</li>
+                                <li v-if="!rules.hasLowercase">Harus ada huruf kecil</li>
+                                <li v-if="!rules.hasNumber">Harus ada angka</li>
+                                <li v-if="!rules.hasSymbol">Harus ada simbol (!@#$%^&*)</li>
+                            </ul>
+                        </template>
+                    </Password>
 
                     <InputError :message="form.errors.password" />
                 </div>
@@ -80,7 +139,9 @@ watch(() => form.username, (val) => {
                         inputClass="w-full" class="w-full" toggleMask :feedback="false" />
                     <InputError :message="form.errors.password_confirmation" />
                 </div>
-
+                
+                <!-- Box reCAPTCHA v2 -->
+                <div class="g-recaptcha" :data-sitekey="sitekey"></div>
                 <Button type="submit" class="mt-2 w-full" tabindex="5" :disabled="form.processing">
                     <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
                     Create account

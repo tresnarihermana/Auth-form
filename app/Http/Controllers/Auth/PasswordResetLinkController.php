@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Password;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Password;
 
 class PasswordResetLinkController extends Controller
 {
@@ -30,7 +31,20 @@ class PasswordResetLinkController extends Controller
     {
         $request->validate([
             'email' => 'required|email',
+            'g-recaptcha-response' => 'required'
         ]);
+        // Verifikasi ke Google reCAPTCHA
+        // dd($request->all());
+        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+            'secret' => config('services.recaptcha.secret'),
+            'response' => $request->input('g-recaptcha-response'),
+            'remoteip' => $request->ip(),
+        ]);
+        if (!($response->json('success'))) {
+            return back()->withErrors([
+                'g-recaptcha-response' => 'Verifikasi captcha gagal. Silakan coba lagi.',
+            ])->withInput();
+        }
 
         Password::sendResetLink(
             $request->only('email')

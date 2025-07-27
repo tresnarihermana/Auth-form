@@ -7,6 +7,8 @@ import AuthLayout from '@/layouts/AuthLayout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { LoaderCircle } from 'lucide-vue-next';
 import InputText from 'primevue/inputtext';
+import { defineProps, onMounted } from 'vue';
+import Swal from 'sweetalert2';
 
 defineProps<{
     status?: string;
@@ -14,11 +16,37 @@ defineProps<{
 
 const form = useForm({
     email: '',
+    'g-recaptcha-response': '',
 });
 
 const submit = () => {
+     const token = grecaptcha.getResponse();
+  if (!token) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Oops!',
+      text: 'Harap centang reCAPTCHA terlebih dahulu!',
+    });
+    return;
+  }
+  form['g-recaptcha-response'] = token;
     form.post(route('password.email'));
 };
+// buat recaptcha
+onMounted(() => {
+    const recaptchaScriptId = 'recaptcha-script';
+
+    if (!document.getElementById(recaptchaScriptId)) {
+        const script = document.createElement('script');
+        script.id = recaptchaScriptId;
+        script.src = 'https://www.google.com/recaptcha/api.js';
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+    }
+});
+const sitekey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+// akhir recapcay
 </script>
 
 <template>
@@ -36,6 +64,7 @@ const submit = () => {
                     <InputText id="email" type="email" name="email" autocomplete="off" v-model="form.email" autofocus placeholder="email@example.com" />
                     <InputError :message="form.errors.email" />
                 </div>
+                <div class="g-recaptcha" :data-sitekey="sitekey"></div>
 
                 <div class="my-6 flex items-center justify-start">
                     <Button class="w-full" :disabled="form.processing">

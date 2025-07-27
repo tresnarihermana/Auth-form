@@ -29,11 +29,11 @@ class PasswordController extends Controller
         if(Auth::user()->password === null){
             $currentPasswordRule = ['nullable'];
         }else{
-            $currentPasswordRule =   ['required', 'current_password','regex:/^[a-zA-Z0-9_]+$/'];
+            $currentPasswordRule =   ['required', 'current_password','regex:/^[A-Za-z\d\W_]+$/'];
         }
         $validated = $request->validate([
             'current_password' => $currentPasswordRule,
-            'password' => ['required', Password::defaults(), 'confirmed', Password::min(8)->numbers()->symbols(), 'max:255' ,'regex:/^[a-zA-Z0-9_]+$/'],
+            'password' => ['required', Password::defaults(), 'confirmed', Password::min(8)->numbers()->symbols(), 'max:255' ,'regex:/^[A-Za-z\d\W_]+$/'],
         ]);
 
         $request->user()->update([
