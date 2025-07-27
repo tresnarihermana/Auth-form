@@ -9,7 +9,7 @@ import { LoaderCircle } from 'lucide-vue-next';
 import Password from 'primevue/password';
 import InputText from 'primevue/inputtext';
 import { reactive, watch, ref, onMounted } from 'vue';
-import { User } from '../../types/index';
+import Divider from 'primevue/divider';
 import Swal from 'sweetalert2';
 const form = useForm({
     name: '',
@@ -31,15 +31,19 @@ const submit = () => {
     return;
   }
 
-  form.data()['g-recaptcha-response'] = token;
+form['g-recaptcha-response'] = token;
+
 
   form.post(route('register'), {
+    onError: (errors) => {
+      console.log(errors);
+    },
     onFinish: () => {
-        // form.reset('password', 'password_confirmation');
-    //   grecaptcha.reset(); // reset reCAPTCHA setelah submit
+      grecaptcha.reset(); // reset captcha biar bisa dicentang lagi
     },
   });
 };
+
 const usernameWarning = ref('');
 watch(() => form.username, (val) => {
     if (/\s/.test(val)) {
@@ -135,13 +139,13 @@ const sitekey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
                         inputClass="w-full" class="w-full" toggleMask :feedback="false" />
                     <InputError :message="form.errors.password_confirmation" />
                 </div>
-
+                
+                <!-- Box reCAPTCHA v2 -->
+                <div class="g-recaptcha" :data-sitekey="sitekey"></div>
                 <Button type="submit" class="mt-2 w-full" tabindex="5" :disabled="form.processing">
                     <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
                     Create account
                 </Button>
-                <!-- Box reCAPTCHA v2 -->
-                <div class="g-recaptcha" :data-sitekey="sitekey"></div>
             </div>
 
             <div class="text-center text-sm text-muted-foreground">
