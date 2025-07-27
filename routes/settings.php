@@ -5,12 +5,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\PasswordController;
-use App\Http\Controllers\Settings\CompleteProfileController;
 
 
 
-Route::patch('settings/CompleteProfile', [CompleteProfileController::class, 'complete'])->name('profile.complete');
-Route::get('settings/CompleteProfile', [CompleteProfileController::class, 'completeprofile'])->name('profile.complete.edit');
 Route::middleware(['web','auth'])->group(function () {
     Route::redirect('settings', '/settings/profile');
 
