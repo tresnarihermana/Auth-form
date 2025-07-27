@@ -11,8 +11,7 @@ import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { type BreadcrumbItem, type User } from '@/types';
 import InputText from 'primevue/inputtext';
 import { Transition } from 'vue';
-import FileUpload from 'primevue/fileupload';
-import { onBeforeMount, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import {ref, watch } from 'vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { computed } from 'vue';
 import { useInitials } from '@/composables/useInitials';
@@ -23,7 +22,6 @@ const props = defineProps<Props>();
 interface Props {
     mustVerifyEmail: boolean;
     status?: string;
-    user: User;
 }
 const breadcrumbItems: BreadcrumbItem[] = [
     {
@@ -154,7 +152,7 @@ const openFileInput = () => {
 const { getInitials } = useInitials();
 
 // Compute whether we should show the avatar image
-const showAvatar = computed(() => props.user.avatar && props.user.avatar !== '');
+// const showAvatar = computed(() => props.user.avatar && props.user.avatar !== '');
 </script>
 <style>
 .profile-user-img {
