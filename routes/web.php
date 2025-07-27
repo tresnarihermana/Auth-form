@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Auth\LoginRequest;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\UserController;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use App\Http\Middleware\EnsureProfileComplete;
 Route::get('/', function () {
@@ -40,8 +41,10 @@ Route::get('/auth/google/callback', function () {
     Auth::login($user);
     return redirect('/dashboard')->with("message", "Selamat datang");
 });
-
-
 Route::post('profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
+
+// Roles and Permissions mulai disini
+Route::resource("users", UserController::class);
+
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
