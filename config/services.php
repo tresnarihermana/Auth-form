@@ -43,8 +43,8 @@ return [
 
     ],
     'recaptcha' => [
-        'site_key' => env('RECAPTHCA_SITE_KEY'),
-        'secret_key' => env('RECAPTHCA_SECRET_KEY'),
+        'key' => env('RECAPTCHA_SITE_KEY'),
+        'secret' => env('RECAPTCHA_SECRET_KEY'),
     ],
     'no-captcha' => [
     'secret' => env('NOCAPTCHA_SECRET'),
