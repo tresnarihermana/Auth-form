@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import Button from 'primevue/button';
+import Swal from 'sweetalert2';
+import { defineProps } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import DeleteUser from '@/components/DeleteUser.vue';
+const page = usePage();
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Users',
@@ -12,8 +17,46 @@ const breadcrumbs: BreadcrumbItem[] = [
 defineProps({
     users: Array
 });
+const flash = page.props?.flash?.message;
+if (flash) {
+let timerInterval;
+Swal.fire({
+  title: "Process Success",
+  icon: "success",
+  html: "User Succesfully added",
+  timer: 1000,
+  timerProgressBar: true,
+  didOpen: () => {
+    const timer = Swal.getPopup().querySelector("b");
+    timerInterval = setInterval(() => {
+      timer.textContent = `${Swal.getTimerLeft()}`;
+    }, 100);
+  },
+  willClose: () => {
+    clearInterval(timerInterval);
+  }})
+}
 
-
+function deleteUser(id) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+        router.delete(route('users.destroy',id))
+        Swal.fire({
+            title: 'Deleted!',
+            text: 'Your file has been deleted.',
+            icon: 'success',
+            timer: 1000,
+            timerProgressBar: true,
+        })
+        })
+    }
 
 </script>
 
@@ -46,8 +89,12 @@ defineProps({
                     <td class="p-3 px-5"><input type="text" v-model="user.username"class="bg-transparent"></td>
                     <td class="p-3 px-5"><input type="text" v-model="user.email" class="bg-transparent"></td>
                     <td class="p-3 px-5"><input type="text" v-model="user.email" class="bg-transparent"></td>
-                    <td class="p-3 px-5 flex justify-end"><button type="button" class="mr-3 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">Save</button><button type="button" class="text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">Delete</button></td>
-                    <td class="p-3 px-5 flex justify-end"><button type="button" class="mr-3 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">Save</button><button type="button" class="text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">Delete</button></td>
+                    <td class="p-3 px-5 flex justify-end">
+                        <Link :href="route('users.edit',user.id)" type="button" class="mr-3 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">Edit</Link>
+                        <button 
+                        @click="deleteUser(user.id)"
+                        type="button" class="text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">Delete</button>
+                    </td>
                 </tr>
             </tbody>
         </table>
