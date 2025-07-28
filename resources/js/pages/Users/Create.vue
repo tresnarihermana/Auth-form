@@ -3,11 +3,9 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/vue3';
 import Button from 'primevue/button';
-import { Form } from '@primevue/forms';
 import InputError from '@/components/InputError.vue';
 import Divider from 'primevue/divider';
 import { reactive, watch, ref, onMounted } from 'vue';
-import Swal from 'sweetalert2';
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password';
 import Checkbox from 'primevue/checkbox';
