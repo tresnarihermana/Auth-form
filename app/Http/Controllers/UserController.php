@@ -1,9 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
@@ -12,7 +17,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return Inertia::render("Users/Index" ,[
+        return Inertia::render("Users/Index", [
             "users" => User::all(),
         ]);
     }
@@ -30,8 +35,45 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|regex:/^[a-zA-Z0-9_]+$/|unique:' . User::class,
+            'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
+            'password' => [
+                'required',
+                'confirmed',
+                Rules\Password::defaults(),
+                Password::min(8)->numbers()->symbols()->max(255)->mixedCase(),
+                'regex:/^[A-Za-z0-9_\-!@#$%^&*()+=\[\]{}]+$/',
+            ],
+            'verified_email' => ['nullable', 'boolean'],
+
+        ], [
+            'name.required' => 'Name is required.',
+            'username.unique' => 'Username is already taken.',
+            'username.regex' => 'Username can only contain letters, numbers, and underscores.',
+            'email.required' => 'Email is required.',
+            'password.required' => 'Password is required.',
+            'password.regex' => 'Password cant contain Space.',
+            'password.confirmed' => 'Passwords do not match'
+        ]);
+
+        if ($request->boolean('verified_email') && $request->verified_email) {
+            $email = now();
+        } else {
+            $email = null;
+        }
+        $user = User::create([
+            'name' => $request->name,
+            'username' => $request->username,
+            'email' => $request->email,
+            'password' =>  Hash::make($request->password),
+            'email_verified_at' => $email,
+        ]);
+
+        return to_route("users.index")->with("message", "Success Create User");
     }
+
 
     /**
      * Display the specified resource.
@@ -46,7 +88,20 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+
+        return Inertia::render("Users/Edit", [
+            "user" => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'email' => $user->email,
+                'verified_email' => $user->hasVerifiedEmail(),
+            ],
+        ]);
+        // return Inertia::render("Users/Edit", [
+        //     "user" => User::find($id),
+        // ]);
     }
 
     /**
@@ -54,7 +109,59 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'username' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[a-zA-Z0-9_]+$/',
+                Rule::unique('users')->ignore($id),
+            ],
+            'email' => [
+                'required',
+                'string',
+                'lowercase',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($id),
+            ],
+            // 'password' => [
+            //     'required',
+            //     'confirmed',
+            //     Rules\Password::defaults(),
+            //     Password::min(8)->numbers()->symbols()->max(255)->mixedCase(),
+            //     'regex:/^[A-Za-z0-9_\-!@#$%^&*()+=\[\]{}]+$/',
+            // ],
+            'verified_email' => ['nullable', 'boolean'],
+
+        ], [
+            'name.required' => 'Name is required.',
+            'username.unique' => 'Username is already taken.',
+            'username.regex' => 'Username can only contain letters, numbers, and underscores.',
+            'email.required' => 'Email is required.',
+            // 'password.required' => 'Password is required.',
+            'password.regex' => 'Password cant contain Space.',
+            'password.confirmed' => 'Passwords do not match'
+        ]);
+        if ($request->boolean('verified_email') && $request->verified_email) {
+            $user = User::findOrFail($id);
+            $user->email_verified_at = now();
+            $user->save();
+        } else {
+            $user = User::findOrFail($id);
+            $user->email_verified_at = null;
+            $user->save();
+        }
+        if ($request->filled('password')) {
+            $user = User::findOrFail($id);
+            $user->password = Hash::make($request->password);
+        }
+        $user = User::findOrFail($id); // cari user berdasarkan ID
+        $user->fill($validated);
+        $user->save();
+
+        return to_route("users.index")->with("message", "Success Create User");
     }
 
     /**
@@ -62,6 +169,7 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        User::destroy($id);
+        return to_route("users.index")->with("message", "Success Delete User");
     }
 }
