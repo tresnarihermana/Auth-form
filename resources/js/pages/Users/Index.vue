@@ -6,7 +6,6 @@ import Button from 'primevue/button';
 import Swal from 'sweetalert2';
 import { defineProps } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import DeleteUser from '@/components/DeleteUser.vue';
 const page = usePage();
 const breadcrumbs: BreadcrumbItem[] = [
     {
