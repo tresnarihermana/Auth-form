@@ -6,6 +6,7 @@ import Button from 'primevue/button';
 import Swal from 'sweetalert2';
 import { defineProps } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+import { can } from '@/lib/can';
 const page = usePage();
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -14,26 +15,28 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 defineProps({
-    users: Array
+    users: Array,
+    roles: Array
 });
 const flash = page.props?.flash?.message;
 if (flash) {
-let timerInterval;
-Swal.fire({
-  title: "Process Success",
-  icon: "success",
-  html: "User Succesfully added",
-  timer: 1000,
-  timerProgressBar: true,
-  didOpen: () => {
-    const timer = Swal.getPopup().querySelector("b");
-    timerInterval = setInterval(() => {
-      timer.textContent = `${Swal.getTimerLeft()}`;
-    }, 100);
-  },
-  willClose: () => {
-    clearInterval(timerInterval);
-  }})
+    let timerInterval;
+    Swal.fire({
+        title: "Process Success",
+        icon: "success",
+        html: "User Succesfully added",
+        timer: 1000,
+        timerProgressBar: true,
+        didOpen: () => {
+            const timer = Swal.getPopup().querySelector("b");
+            timerInterval = setInterval(() => {
+                timer.textContent = `${Swal.getTimerLeft()}`;
+            }, 100);
+        },
+        willClose: () => {
+            clearInterval(timerInterval);
+        }
+    })
 }
 
 function deleteUser(id) {
@@ -45,60 +48,100 @@ function deleteUser(id) {
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-        router.delete(route('users.destroy',id))
-        Swal.fire({
-            title: 'Deleted!',
-            text: 'Your file has been deleted.',
-            icon: 'success',
-            timer: 1000,
-            timerProgressBar: true,
-        })
-        })
+      }).then((result) => {
+    if (result.isConfirmed) {
+        router.delete(route('users.destroy', id), {
+            onSuccess: () => {
+                Swal.fire({
+                    title: 'Deleted!',
+                    text: 'This user has been deleted.',
+                    icon: 'success',
+                    timer: 1000,
+                    timerProgressBar: true,
+                });
+            },
+            onError: () => {
+                Swal.fire({
+                    title: 'Failed!',
+                    text: 'Something went wrong. The role was not deleted.',
+                    icon: 'error',
+                });
+            }
+        });
     }
+});
+}
+
 
 </script>
 
 <template>
+
     <Head title="Users" />
     <AppLayout :breadcrumbs="breadcrumbs">
-<!-- component -->
-<div class="text-gray-900 bg-gray-200">
-    <div class="p-4 flex">
-        <h1 class="text-3xl">
-            Users
-        </h1>
-    </div>
-    <div class="px-4">
-    <Button label="Add User" as="a" :href="route('users.create')"  icon="pi pi-plus" icon-pos="left" />  
-</div>
-    <div class="px-3 py-4 flex justify-center">
-        
-        <table class="w-full text-md bg-white shadow-md rounded mb-4">
-            <tbody>
-                <tr class="border-b">
-                    <th class="text-left p-3 px-5">Name</th>
-                    <th class="text-left p-3 px-5">Username</th>
-                    <th class="text-left p-3 px-5">Email</th>
-                    <th class="text-left p-3 px-5">Role</th>
-                    <th></th>
-                </tr>
-                <tr  v-for="user in users" class="border-b hover:bg-orange-100 bg-gray-100">
-                    <td class="p-3 px-5"><input type="text" v-model="user.name"class="bg-transparent"></td>
-                    <td class="p-3 px-5"><input type="text" v-model="user.username"class="bg-transparent"></td>
-                    <td class="p-3 px-5"><input type="text" v-model="user.email" class="bg-transparent"></td>
-                    <td class="p-3 px-5"><input type="text" v-model="user.email" class="bg-transparent"></td>
-                    <td class="p-3 px-5 flex justify-end">
-                        <Link :href="route('users.edit',user.id)" type="button" class="mr-3 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">Edit</Link>
-                        <button 
-                        @click="deleteUser(user.id)"
-                        type="button" class="text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">Delete</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+        <!-- component -->
+        <div class="text-gray-900 bg-gray-200">
+            <div class="p-4 flex">
+                <h1 class="text-3xl">
+                    Users
+                </h1>
+            </div>
+            <div class="px-4">
+                <Button v-if="can('users.create')" label="Add User" as="a" :href="route('users.create')"
+                    icon="pi pi-plus" icon-pos="left" />
+            </div>
+            <div class="px-3 py-4 flex justify-center">
+
+                <table class="w-full text-md bg-white shadow-md rounded mb-4">
+                    <tbody>
+                        <tr class="border-b">
+                            <th class="text-left p-3 px-5">Name</th>
+                            <th class="text-left p-3 px-5">Username</th>
+                            <th class="text-left p-3 px-5">Email</th>
+                            <th class="text-left p-3 px-5">Email Verified At</th>
+                            <th class="text-left p-3 px-5">Role</th>
+                            <th></th>
+                        </tr>
+                        <tr v-for="user in users" class="border-b hover:bg-orange-100 bg-gray-100">
+                            <td class="p-3 px-5"><input type="text" v-model="user.name" class="bg-transparent" disabled>
+                            </td>
+                            <td class="p-3 px-5"><input type="text" v-model="user.username" class="bg-transparent"
+                                    disabled></td>
+                            <td class="p-3 px-5"><input type="text" v-model="user.email" class="bg-transparent"
+                                    disabled></td>
+                            <td class="p-3 px-5">
+                                <span v-if="user.email_verified_at"
+                                    class="mr-1 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-2xl">
+                                    verified
+                                </span>
+                                <span v-if="!user.email_verified_at"
+                                    class="mr-1 bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-2xl">
+                                    unverified
+                                </span>
+                            </td>
+                            <td class="p-3 px-5">
+                                <span v-for="role in user.roles" :key="role.id"
+                                    class="mr-1 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-2xl">
+                                    {{ role.name }}
+                                </span>
+
+
+                            </td>
+                            <td class="p-3 px-5 flex justify-end">
+                                <Link v-if="can('users.edit')" :href="route('users.edit', user.id)" type="button"
+                                    class="mr-3 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">
+                                Edit</Link>
+                                <Link :href="route('users.show', user.id)" type="button"
+                                    class="mr-3 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">
+                                Show</Link>
+                                <button v-if="can('users.delete')" @click="deleteUser(user.id)" type="button"
+                                    class="text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
     </AppLayout>
 </template>
