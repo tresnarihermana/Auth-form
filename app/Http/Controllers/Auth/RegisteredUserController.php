@@ -9,6 +9,7 @@ use Inertia\Response;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\RedirectResponse;
@@ -69,9 +70,9 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' =>  Hash::make($request->password),
         ]);
-
+        $user->assignRole('user')->save();
         event(new Registered($user));
-        // Auth::login($user);
+        Auth::login($user);
         session(['message' => 'verify email Success']);
         return to_route('login');
     }
