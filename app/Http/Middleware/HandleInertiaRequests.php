@@ -62,7 +62,9 @@ class HandleInertiaRequests extends Middleware
                         'email_verified_at' => $user->email_verified_at,
                         'has_password' => !is_null($user->password),
                     ] : null;
-                }
+                },
+                'permissions' => fn() => $request->user()?->getAllPermissions()->pluck("name") ?? [],
+
             ],
             'ziggy' => [
                 ...(new Ziggy)->toArray(),
