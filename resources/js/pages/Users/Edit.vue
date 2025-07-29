@@ -21,7 +21,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 const page = usePage();
 const props = defineProps({
-    user: Object
+    user: Object,
+    roles: Array,
+    userRoles: Array,
 })
 const form = useForm({
     name: props.user.name,
@@ -30,7 +32,7 @@ const form = useForm({
     password: '',
     password_confirmation: '',
     verified_email: Boolean(props.user.verified_email),
-    // role: '',
+    roles: props.userRoles || [],
 })
 
 const submit = () => {
@@ -158,11 +160,23 @@ watch(() => form.password, validatePassword)
                             <InputError :message="form.errors.password_confirmation" />
                         </div>
 
-                        <!-- Input field for 'role'
-                    <div class="my-2">
-                        <label for="class" class="text-sm sm:text-md font-bold text-gray-700 dark:text-gray-300">Role</label>
-                        <input type="text" name="class" class="block w-full border border-emerald-500 outline-emerald-800 px-2 py-2 text-sm sm:text-md rounded-md my-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" id="class">
-                    </div> -->
+           <!-- Input field for 'role' -->
+
+                        <div class="grid gap-2">
+                            <Label for="roles">Roles</Label>
+                            <div class="flex flex-col gap-2">
+                                <div class="flex flex-wrap gap-4">
+                                    <div v-for="role in roles" :key="role.name"
+                                        class="flex items-center gap-2">
+                                        <Checkbox v-model="form.roles" :value="role.name"
+                                            :inputId="'perm-' + role.name" />
+                                        <label :for="'perm-' + role.name">{{ role.name }}</label>
+                                    </div>
+                                </div>
+                                <Message v-if="form.errors.roles" severity="error" size="small" variant="simple">
+                                    {{form.errors?.roles }}</Message>
+                            </div>
+                        </div>
 
                         <!-- Save button -->
                         <div class="py-2 ">
