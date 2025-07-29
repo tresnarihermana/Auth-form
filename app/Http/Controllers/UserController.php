@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
@@ -18,7 +19,7 @@ class UserController extends Controller
     public function index()
     {
         return Inertia::render("Users/Index", [
-            "users" => User::all(),
+            "users" => User::with("roles")->get(),
         ]);
     }
 
@@ -27,7 +28,9 @@ class UserController extends Controller
      */
     public function create()
     {
-        return Inertia::render("Users/Create");
+        return Inertia::render("Users/Create", [
+            "roles" => Role::all(),
+        ]);
     }
 
     /**
@@ -35,6 +38,8 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
+
         $request->validate([
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|regex:/^[a-zA-Z0-9_]+$/|unique:' . User::class,
@@ -70,6 +75,8 @@ class UserController extends Controller
             'password' =>  Hash::make($request->password),
             'email_verified_at' => $email,
         ]);
+        $user->syncRoles($request->roles);
+
 
         return to_route("users.index")->with("message", "Success Create User");
     }
@@ -80,7 +87,21 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+        return Inertia::render("Users/Show", [
+            "user" => [
+                'id' => $user->id,
+                'avatar' => $user->avatar,
+                'name' => $user->name,
+                'username' => $user->username,
+                'email' => $user->email,
+                'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+                'updated_at' => $user->updated_at->format('Y-m-d H:i:s'),
+                'email_verified_at' => $user->email_verified_at->format('Y-m-d H:i:s'),
+        ],
+            "roles" => Role::all(),
+            "userRoles" => User::findOrFail($id)->roles->pluck("name")->all(),
+        ]);
     }
 
     /**
@@ -89,7 +110,12 @@ class UserController extends Controller
     public function edit(string $id)
     {
         $user = User::findOrFail($id);
-
+        if ($user->hasRole('Super Admin') && !auth()->user()->hasRole('Super Admin')) {
+            abort(403, 'You are not allowed to edit a Super Admin.');
+        };
+        if ($user->hasRole('admin') && !auth()->user()->hasRole('Super Admin')) {
+            abort(403, 'Admin does not allowed to edit another Admin.');
+        }
         return Inertia::render("Users/Edit", [
             "user" => [
                 'id' => $user->id,
@@ -98,6 +124,8 @@ class UserController extends Controller
                 'email' => $user->email,
                 'verified_email' => $user->hasVerifiedEmail(),
             ],
+            "roles" => Role::all(),
+            "userRoles" => $user->roles->pluck("name")->all(),
         ]);
         // return Inertia::render("Users/Edit", [
         //     "user" => User::find($id),
@@ -107,19 +135,26 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $id,)
     {
+        $user = User::findOrFail($id);
+        if ($user->hasRole('Super Admin') && !auth()->user()->hasRole('Super Admin')) {
+            abort(403, 'You are not allowed to edit a Super Admin.');
+        };
+        if ($user->hasRole('admin') && !auth()->user()->hasRole('Super Admin')) {
+            abort(403, 'Admin does not allowed to edit another Admin.');
+        }
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'nullable|string|max:255',
             'username' => [
-                'required',
+                'nullable',
                 'string',
                 'max:255',
                 'regex:/^[a-zA-Z0-9_]+$/',
                 Rule::unique('users')->ignore($id),
             ],
             'email' => [
-                'required',
+                'nullable',
                 'string',
                 'lowercase',
                 'email',
@@ -160,7 +195,22 @@ class UserController extends Controller
         $user = User::findOrFail($id); // cari user berdasarkan ID
         $user->fill($validated);
         $user->save();
+        // Cek kalau user login bukan super admin
+        if (!auth()->user()->hasRole('Super Admin')) {
 
+            // 1. Cek jika user target punya role admin/super admin
+            if ($user->hasAnyRole(['admin', 'Super Admin'])) {
+                abort(403, 'You are not allowed to edit another admin or super admin.');
+            }
+
+            // 2. Cek jika request ingin memberi role admin/super admin
+            if (in_array('admin', (array) $request->roles) || in_array('Super Admin', (array) $request->roles)) {
+                abort(403, 'You are not allowed to assign admin or super admin roles.');
+            }
+        }
+
+
+        $user->syncRoles($request->roles);
         return to_route("users.index")->with("message", "Success Create User");
     }
 
@@ -169,6 +219,13 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
+        $user = User::findOrFail($id);
+        if ($user->hasRole('admin') && !auth()->user()->hasRole('Super Admin')) {
+            abort(403, 'You are not allowed to delete another Admin.');
+        };
+        if ($user->hasRole('Super Admin') && !auth()->user()->hasRole('Super Admin')) {
+            abort(403, 'You are not allowed to delete Super Admin.');
+        };
         User::destroy($id);
         return to_route("users.index")->with("message", "Success Delete User");
     }
