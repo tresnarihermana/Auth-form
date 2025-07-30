@@ -9,7 +9,7 @@ import { usePage } from '@inertiajs/vue3';
 import { can } from '@/lib/can';
 import { useInitials } from '@/composables/useInitials';
 import { Form } from '@primevue/forms';
-import { Search } from 'lucide-vue-next';
+import { Search, Save, Plus } from 'lucide-vue-next';
 const page = usePage();
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -100,10 +100,10 @@ const form = useForm({
     role: props.filters.role || null,
 })
 watch(() => form.search, () => {
-  form.get(route('users.index'), {
-    preserveScroll: true,
-    preserveState: true,
-  });
+    form.get(route('users.index'), {
+        preserveScroll: true,
+        preserveState: true,
+    });
 });
 watch(() => form.role, () => {
     form.get(route('users.index'), { preserveState: true, replace: true })
@@ -167,6 +167,14 @@ watch(() => form.role, () => {
                             <input placeholder="Search" v-model="form.search"
                                 class="appearance-none rounded-r rounded-l sm:rounded-l-none border border-gray-400 border-b block pl-8 pr-6 py-2 w-full bg-white text-sm placeholder-gray-400 text-gray-700 focus:bg-white focus:placeholder-gray-600 focus:text-gray-700 focus:outline-none" />
                         </div>
+                        <div class="relative mx-2">
+                            <button v-if="can('users.create')" @click="router.get(route('users.create'))" 
+                                type="button"
+                                class=" h-full rounded border block appearance-none w-full bg-green-400 border-green-400 text-white py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-green focus:border-green-500">
+                           + Add User
+                        </button>
+                        </div>
+
                     </div>
                     <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
                         <div class="inline-block min-w-full shadow rounded-lg overflow-hidden">
@@ -271,7 +279,7 @@ watch(() => form.role, () => {
                                     {{
                                         users.current_page * users.per_page > users.total
                                             ? users.total
-                                    : users.current_page * users.per_page
+                                            : users.current_page * users.per_page
                                     }}
                                     of {{ users.total }} entries
                                 </span>
