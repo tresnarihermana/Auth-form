@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
         ]);
         $user->assignRole('user');
 
-     User::factory(10)->create()->each(function ($user) {
+     User::factory(100)->create()->each(function ($user) {
             $user->assignRole('user');
         });
     }
