@@ -10,9 +10,12 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Requests\Auth\LoginRequest;
 use Laravel\Socialite\Facades\Socialite;
+use Spatie\Permission\Contracts\Permission;
+use App\Http\Controllers\PermissionController;
 use App\Http\Middleware\EnsureProfileComplete;
 use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Session\Middleware\AuthenticateSession;
+
 Route::get('/', function () {
     return redirect('login');
     
@@ -81,6 +84,23 @@ Route::resource("roles", RoleController::class)
 Route::resource("roles", RoleController::class)
 ->only(['index','show'])
 ->middleware("permission:roles.create|roles.edit|roles.delete|roles.view");
+
+// permissions
+Route::resource("permissions", PermissionController::class)
+->only(['create','store'])
+->middleware("permission:permissions.create");
+
+Route::resource("permissions", PermissionController::class)
+->only(['edit','update'])
+->middleware("permission:permissions.edit");
+
+Route::resource("permissions", PermissionController::class)
+->only(['destroy'])
+->middleware("permission:permissions.delete");
+
+Route::resource("permissions", PermissionController::class)
+->only(['index','show'])
+->middleware("permission:permissions.create|permissions.edit|permissions.delete|permissions.view");
 });
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
