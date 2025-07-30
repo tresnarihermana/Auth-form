@@ -16,10 +16,29 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $perPage = $request->input('per_page', 10);
+        $search = $request->input('search');
+        $role = $request->input('role');
+        $users = User::with('roles')
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%")
+                        ->orWhere('username', 'like', "%$search%");
+                });
+            })->when($role, function ($query, $role) {
+                $query->whereHas('roles', function ($q) use ($role) {
+                    $q->where('name', '=', $role);
+                });
+            })
+            ->paginate($perPage)
+            ->withQueryString();
+
         return Inertia::render("Users/Index", [
-            "users" => User::with("roles")->get(),
+            "users" => $users,
+            "roles" => Role::all(),
+            'filters' => $request->only(['search','role']),
         ]);
     }
 
@@ -95,10 +114,10 @@ class UserController extends Controller
                 'name' => $user->name,
                 'username' => $user->username,
                 'email' => $user->email,
+                'email_verified_at' => $user->email_verified_at ? $user->email_verified_at->format('Y-m-d H:i:s') : null,
                 'created_at' => $user->created_at->format('Y-m-d H:i:s'),
                 'updated_at' => $user->updated_at->format('Y-m-d H:i:s'),
-                'email_verified_at' => $user->email_verified_at->format('Y-m-d H:i:s'),
-        ],
+            ],
             "roles" => Role::all(),
             "userRoles" => User::findOrFail($id)->roles->pluck("name")->all(),
         ]);
