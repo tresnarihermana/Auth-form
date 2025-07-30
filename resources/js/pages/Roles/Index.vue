@@ -91,13 +91,13 @@ watch(perPage, (value) => {
 const form = useForm({
     search: props.filters.search || '',
     permission: props.filters.permission || null,
-    
+
 })
 watch(() => form.search, () => {
-  form.get(route('roles.index'), {
-    preserveScroll: true,
-    preserveState: true,
-  });
+    form.get(route('roles.index'), {
+        preserveScroll: true,
+        preserveState: true,
+    });
 });
 watch(() => form.permission, () => {
     form.get(route('roles.index'), { preserveState: true, replace: true })
@@ -106,11 +106,11 @@ watch(() => form.permission, () => {
 
 <template>
 
-    <Head title="roles" />
+    <Head title="Roles" />
     <AppLayout :breadcrumbs="breadcrumbs">
         <!-- component -->
         <div class="text-gray-900 bg-gray-200">
-            <div class="p-4 flex">
+            <!-- <div class="p-4 flex">
                 <h1 class="text-3xl">
                     Roles
                 </h1>
@@ -118,13 +118,13 @@ watch(() => form.permission, () => {
             <div class="px-4">
                 <Button v-if="can('roles.create')" label="Add Role" as="a" :href="route('roles.create')"
                     icon="pi pi-plus" icon-pos="left" />
-            </div>
+            </div> -->
 
             <body class="antialiased font-sans bg-gray-200">
                 <div class="container mx-auto px-4 sm:px-8">
                     <div class="py-8">
                         <div>
-                            <h2 class="text-2xl font-semibold leading-tight">roles</h2>
+                            <h2 class="text-2xl font-semibold leading-tight">Roles</h2>
                         </div>
                         <div class="my-2 flex sm:flex-row flex-col">
                             <div class="flex flex-row mb-1 sm:mb-0">
@@ -147,8 +147,9 @@ watch(() => form.permission, () => {
                                 <div class="relative">
                                     <select v-model="form.permission"
                                         class="appearance-none h-full rounded-r border-t sm:rounded-r-none sm:border-r-0 border-r border-b block appearance-none w-full bg-white border-gray-400 text-gray-700 py-2 px-4 pr-8 leading-tight focus:outline-none focus:border-l focus:border-r focus:bg-white focus:border-gray-500">
-                                        <option :value="null" >All</option>
-                                        <option v-for="permission in permissions" :key="permission.id" :value="permission.name">{{ permission.name }}</option>
+                                        <option :value="null">All</option>
+                                        <option v-for="permission in permissions" :key="permission.id"
+                                            :value="permission.name">{{ permission.name }}</option>
                                     </select>
                                     <div
                                         class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
@@ -168,11 +169,17 @@ watch(() => form.permission, () => {
                                         </path>
                                     </svg>
                                 </span>
-                                <input v-model="form.search"
-                                placeholder="Search"
+                                <input v-model="form.search" placeholder="Search"
                                     class="appearance-none rounded-r rounded-l sm:rounded-l-none border border-gray-400 border-b block pl-8 pr-6 py-2 w-full bg-white text-sm placeholder-gray-400 text-gray-700 focus:bg-white focus:placeholder-gray-600 focus:text-gray-700 focus:outline-none" />
                             </div>
+                            <div class="relative mx-2">
+                                <button v-if="can('roles.create')" @click="router.get(route('roles.create'))" type="button"
+                                    class=" h-full rounded border block appearance-none w-full bg-green-400 border-green-400 text-white py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-green focus:border-green-500">
+                                    + Add Role
+                                </button>
+                            </div>
                         </div>
+
                         <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
                             <div class="inline-block min-w-full shadow rounded-lg overflow-hidden">
                                 <table class="min-w-full leading-normal">
