@@ -12,11 +12,27 @@ class RoleController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Inertia::render("Roles/Index",[
-            "roles" => Role::with('permissions')->get(),
-            
+        $perPage = $request->input('per_page', 10);
+        $search = $request->input('search');
+        $permission = $request->input('permission');
+        $roles = Role::with('permissions')
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%");
+                });
+            })->when($permission, function ($query, $permission) {
+                $query->whereHas('permissions', function ($q) use ($permission) {
+                    $q->where('name', '=', $permission);
+                });
+            })
+            ->paginate($perPage)
+            ->withQueryString();
+        return Inertia::render("Roles/Index", [
+            "roles" => $roles,
+            "permissions" => Permission::all(),
+            'filters' => $request->only(['search','role']),
         ]);
     }
 
@@ -25,7 +41,7 @@ class RoleController extends Controller
      */
     public function create()
     {
-        return Inertia::render("Roles/Create",[
+        return Inertia::render("Roles/Create", [
             "permissions" => Permission::all(),
         ]);
     }
@@ -62,7 +78,7 @@ class RoleController extends Controller
     public function edit(string $id)
     {
         $role = Role::findOrFail($id);
-        return Inertia::render("Roles/Edit",[
+        return Inertia::render("Roles/Edit", [
             "role" => $role,
             "rolePermissions" => $role->permissions->pluck("name")->all(),
             "permissions" => Permission::all(),
@@ -75,7 +91,7 @@ class RoleController extends Controller
     public function update(Request $request, string $id)
     {
         // dd($request->all());
-         $request->validate([
+        $request->validate([
             'name' => 'required',
             'permissions' => 'required',
         ]);
@@ -94,7 +110,7 @@ class RoleController extends Controller
     public function destroy(string $id)
     {
         $role = Role::findOrFail($id);
-        if($role->name === "Super Admin"){
+        if ($role->name === "Super Admin") {
             abort(403, 'You are not allowed to delete Super Admin Role.');
         };
 
