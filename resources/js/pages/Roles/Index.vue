@@ -120,7 +120,7 @@ watch(() => form.permission, () => {
                     icon="pi pi-plus" icon-pos="left" />
             </div> -->
 
-            <body class="antialiased font-sans bg-gray-200">
+            <div class="antialiased font-sans bg-gray-200">
                 <div class="container mx-auto px-4 sm:px-8">
                     <div class="py-8">
                         <div>
@@ -172,9 +172,10 @@ watch(() => form.permission, () => {
                                 <input v-model="form.search" placeholder="Search"
                                     class="appearance-none rounded-r rounded-l sm:rounded-l-none border border-gray-400 border-b block pl-8 pr-6 py-2 w-full bg-white text-sm placeholder-gray-400 text-gray-700 focus:bg-white focus:placeholder-gray-600 focus:text-gray-700 focus:outline-none" />
                             </div>
-                            <div class="relative mx-2">
-                                <button v-if="can('roles.create')" @click="router.get(route('roles.create'))" type="button"
-                                    class=" h-full rounded border block appearance-none w-full bg-green-400 border-green-400 text-white py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-green focus:border-green-500">
+                            <div class="flex justify-end px-3">
+                                <button v-if="can('roles.create')" @click="router.get(route('roles.create'))"
+                                    type="button"
+                                    class="rounded border block appearance-none bg-green-400 border-green-400 text-white py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-green focus:border-green-500">
                                     + Add Role
                                 </button>
                             </div>
@@ -217,12 +218,23 @@ watch(() => form.permission, () => {
                                                     {{ role.name }}
                                                 </p>
                                             </td>
-                                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                                <span v-for="permission in role.permissions" :key="permission.id"
-                                                    class="mr-1 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5">
-                                                    {{ permission.name }}
-                                                </span>
+                                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm max-w-s">
+                                                <div class="flex flex-wrap gap-1">
+                                                    <template
+                                                        v-for="(permission, index) in role.permissions.slice(0, 5)" :key="permission.id">
+                                                        <span 
+                                                            class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                                                            {{ permission.name }}
+                                                        </span>
+                                                    </template>
+                                                    <span v-if="role.permissions.length > 5"
+                                                        class="bg-gray-100 text-gray-600 text-xs font-medium px-2.5 py-0.5 rounded"
+                                                        :title="role.permissions.map(p => p.name).join(', ')">
+                                                        +{{ role.permissions.length - 5 }} more
+                                                    </span>
+                                                </div>
                                             </td>
+
                                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                                 <Link v-if="can('roles.edit')" :href="route('roles.edit', role.id)"
                                                     type="button"
@@ -248,7 +260,7 @@ watch(() => form.permission, () => {
                                         }}
                                         of {{ roles.total }} entries
                                     </span>
-                                    <div class="inline-flex mt-2 xs:mt-0">
+                                    <div class="inline-flex mt-2 xs:mt-0 flex">
                                         <button @click="router.get(roles.prev_page_url)"
                                             :disabled="!roles.prev_page_url"
                                             class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-l">
@@ -266,7 +278,7 @@ watch(() => form.permission, () => {
                         </div>
                     </div>
                 </div>
-            </body>
+            </div>
         </div>
 
     </AppLayout>
