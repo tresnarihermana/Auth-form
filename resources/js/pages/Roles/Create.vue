@@ -61,9 +61,9 @@ const submit = () => {
 
                         <!-- Input field for 'Name' -->
                         <div class="grid gap-2">
-                            <Label for="name">Fullname</Label>
-                            <InputText id="name" type="text" required autofocus :tabindex="1" autocomplete="fullname"
-                                v-model="form.name" placeholder="Enter your fullname" />
+                            <Label for="name">Role name</Label>
+                            <InputText id="name" type="text" required autofocus :tabindex="1" autocomplete="role_name"
+                                v-model="form.name" placeholder="Enter Role Name" />
                             <InputError :message="form.errors.name" />
                         </div>
                         <div class="grid gap-2">
