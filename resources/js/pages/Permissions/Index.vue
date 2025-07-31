@@ -122,7 +122,7 @@ watch(() => form.role, () => {
                     icon="pi pi-plus" icon-pos="left" />
             </div> -->
 
-            <body class="antialiased font-sans bg-gray-200">
+            <div class="antialiased font-sans bg-gray-200">
                 <div class="container mx-auto px-4 sm:px-8">
                     <div class="py-8">
                         <div>
@@ -268,7 +268,7 @@ watch(() => form.role, () => {
                         </div>
                     </div>
                 </div>
-            </body>
+            </div>
         </div>
 
     </AppLayout>
