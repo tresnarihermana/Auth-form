@@ -106,7 +106,7 @@ watch(() => form.password, validatePassword)
                         <div class="grid gap-2">
                             <Label for="name">Fullname</Label>
                             <InputText id="name" type="text" required autofocus :tabindex="1" autocomplete="fullname"
-                                v-model="form.name" placeholder="Enter your fullname" />
+                                v-model="form.name" placeholder="Enter fullname" />
                             <InputError :message="form.errors.name" />
                         </div>
 
@@ -114,7 +114,7 @@ watch(() => form.password, validatePassword)
                         <div class="grid gap-2">
                             <Label for="username">Username</Label>
                             <InputText id="username" type="text" required autofocus :tabindex="1"
-                                autocomplete="username" v-model="form.username" placeholder="Enter your username" />
+                                autocomplete="username" v-model="form.username" placeholder="Enter username" />
                             <InputError :message="form.errors.username ?? usernameWarning" />
 
                         </div>

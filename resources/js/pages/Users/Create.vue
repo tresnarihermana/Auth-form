@@ -26,6 +26,7 @@ const form = useForm({
     password_confirmation: '',
     verified_email: false,
     roles: [],
+    is_active: true,
 })
 const submit = () => {
     form.post(route('users.store'), {
@@ -97,7 +98,7 @@ watch(() => form.password, validatePassword)
                         <div class="grid gap-2">
                             <Label for="name">Fullname</Label>
                             <InputText id="name" type="text" required autofocus :tabindex="1" autocomplete="fullname"
-                                v-model="form.name" placeholder="Enter your fullname" />
+                                v-model="form.name" placeholder="Enter fullname" />
                             <InputError :message="form.errors.name" />
                         </div>
 
@@ -105,7 +106,7 @@ watch(() => form.password, validatePassword)
                         <div class="grid gap-2">
                             <Label for="username">Username</Label>
                             <InputText id="username" type="text" required autofocus :tabindex="1"
-                                autocomplete="username" v-model="form.username" placeholder="Enter your username" />
+                                autocomplete="username" v-model="form.username" placeholder="Enter username" />
                             <InputError :message="form.errors.username ?? usernameWarning" />
 
                         </div>
@@ -121,6 +122,11 @@ watch(() => form.password, validatePassword)
                             <Checkbox inputId="verified_email" v-model="form.verified_email" :tabindex="3"
                                 :binary="1" />
                             <label for="verified_email">Verified This Email</label>
+                        </div>
+
+                        <div class="flex items-center gap-2 py-2">
+                            <Checkbox inputId="is_active" v-model="form.is_active" :binary="true" />
+                            <label for="is_active">Aktifkan user ini</label>
                         </div>
 
                         <div class="grid gap-2 w-full">
@@ -157,15 +163,13 @@ watch(() => form.password, validatePassword)
                             <Label for="roles">Roles</Label>
                             <div class="flex flex-col gap-2">
                                 <div class="flex flex-wrap gap-4">
-                                    <div v-for="role in roles" :key="role.id"
-                                        class="flex items-center gap-2">
-                                        <Checkbox v-model="form.roles" :value="role.id"
-                                            :inputId="'perm-' + role.id" />
+                                    <div v-for="role in roles" :key="role.id" class="flex items-center gap-2">
+                                        <Checkbox v-model="form.roles" :value="role.id" :inputId="'perm-' + role.id" />
                                         <label :for="'perm-' + role.id">{{ role.name }}</label>
                                     </div>
                                 </div>
                                 <Message v-if="form.errors.roles" severity="error" size="small" variant="simple">
-                                    {{form.errors?.roles }}</Message>
+                                    {{ form.errors?.roles }}</Message>
                             </div>
                         </div>
                         <!-- Save button -->
