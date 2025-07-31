@@ -39,7 +39,7 @@ class RegisteredUserController extends Controller
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults(), Password::min(8)->numbers()->symbols()->max(255)->mixedCase(),'regex:/^[A-Za-z0-9_\-!@#$%^&*()+=\[\]{}]+$/'
 ],
-            'g-recaptcha-response' => 'required',
+            'g-recaptcha-response' => 'required',            
         ], [
             'name.required' => 'Name is required.',
             'username.unique' => 'Username is already taken.',
@@ -69,6 +69,7 @@ class RegisteredUserController extends Controller
             'username' => $request->username,
             'email' => $request->email,
             'password' =>  Hash::make($request->password),
+            'is_active' => true,
         ]);
         $user->assignRole('user')->save();
         event(new Registered($user));
