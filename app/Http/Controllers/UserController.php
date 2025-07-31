@@ -11,6 +11,7 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
+
 class UserController extends Controller
 {
     /**
@@ -38,7 +39,7 @@ class UserController extends Controller
         return Inertia::render("Users/Index", [
             "users" => $users,
             "roles" => Role::all(),
-            'filters' => $request->only(['search','role']),
+            'filters' => $request->only(['search', 'role']),
         ]);
     }
 
@@ -47,8 +48,14 @@ class UserController extends Controller
      */
     public function create()
     {
+        $roleQuery = Role::query();
+        $user = auth()->user();
+        if (!$user->hasRole('Super Admin')) {
+            $roleQuery->whereNot('name', 'Super Admin')->WhereNot('name', 'admin');
+        }
+
         return Inertia::render("Users/Create", [
-            "roles" => Role::all(),
+            "roles" => $roleQuery->get(),
         ]);
     }
 
@@ -71,6 +78,7 @@ class UserController extends Controller
                 'regex:/^[A-Za-z0-9_\-!@#$%^&*()+=\[\]{}]+$/',
             ],
             'verified_email' => ['nullable', 'boolean'],
+            'is_active' => 'boolean',
 
         ], [
             'name.required' => 'Name is required.',
@@ -93,6 +101,7 @@ class UserController extends Controller
             'email' => $request->email,
             'password' =>  Hash::make($request->password),
             'email_verified_at' => $email,
+            'is_active' => $request->boolean('is_active') ? true : false,
         ]);
         $user->syncRoles($request->roles);
 
@@ -135,6 +144,11 @@ class UserController extends Controller
         if ($user->hasRole('admin') && !auth()->user()->hasRole('Super Admin')) {
             abort(403, 'Admin does not allowed to edit another Admin.');
         }
+        $roleQuery = Role::query();
+        $auth = auth()->user();
+        if (!$auth->hasRole('Super Admin')) {
+            $roleQuery->whereNot('name', 'Super Admin')->WhereNot('name', 'admin');
+        }
         return Inertia::render("Users/Edit", [
             "user" => [
                 'id' => $user->id,
@@ -143,7 +157,7 @@ class UserController extends Controller
                 'email' => $user->email,
                 'verified_email' => $user->hasVerifiedEmail(),
             ],
-            "roles" => Role::all(),
+            "roles" =>$roleQuery->get(),
             "userRoles" => $user->roles->pluck("name")->all(),
         ]);
         // return Inertia::render("Users/Edit", [
@@ -246,6 +260,18 @@ class UserController extends Controller
             abort(403, 'You are not allowed to delete Super Admin.');
         };
         User::destroy($id);
-        return to_route("users.index")->with("message", "Success Delete User");
+        return to_route("users.index")->response("message", "Success Delete User");
+    }
+    public function toggleStatus(string $id)
+    {
+        $auth = auth()->user();
+        $user = User::findOrFail($id);
+        if(!$auth->can('users.toggleStatus')){
+            abort(403, 'You are not allowed to toggle Status Users.');
+
+        }
+        $user->is_active = !$user->is_active;
+        $user->save();
+        return redirect()->back()->with('message', 'Status berhasil diubah.');
     }
 }
