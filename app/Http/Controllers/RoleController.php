@@ -53,7 +53,7 @@ class RoleController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'permissions' => 'required|array',
+            'permissions' => 'nullable|array',
         ]);
 
         $role = Role::create([
@@ -69,7 +69,7 @@ class RoleController extends Controller
      */
     public function show(string $id)
     {
-        //
+        return Inertia::render("Roles/Index");
     }
 
     /**
@@ -93,7 +93,7 @@ class RoleController extends Controller
         // dd($request->all());
         $request->validate([
             'name' => 'required',
-            'permissions' => 'required',
+            'permissions' => 'nullable',
         ]);
 
         $role = Role::findOrFail($id);
