@@ -20,6 +20,8 @@ class RolePermissionSeeder extends Seeder
             "users.create",
             "users.edit",
             "users.delete",
+            "users.show",
+            "users.toggleStatus",
             "roles.view",
             "roles.create",
             "roles.edit",
@@ -38,9 +40,11 @@ class RolePermissionSeeder extends Seeder
         $adminRole->syncPermissions($permissions);
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $adminRole->syncPermissions(['users.view', 'roles.view', 'users.create', 'users.edit', 'users.delete',]);
+        $adminRole = Role::firstOrCreate(['name' => 'operator']);
+        $adminRole->syncPermissions(['']);
 
         $userRole = Role::firstOrCreate(['name' => 'user']);
-        $userRole->givePermissionTo(['users.view', 'roles.view']);
+        $userRole->givePermissionTo(['']);
     }
 }
 
