@@ -67,6 +67,9 @@ function deleteUser(id) {
     }).then((result) => {
         if (result.isConfirmed) {
             router.delete(route('users.destroy', id), {
+                headers: {
+                    Accept: 'application/json', // 👈 penting
+                },
                 onSuccess: () => {
                     Swal.fire({
                         title: 'Deleted!',
@@ -82,7 +85,9 @@ function deleteUser(id) {
                         text: 'Something went wrong. The role was not deleted.',
                         icon: 'error',
                     });
-                }
+                },
+                onFailure: handleFailure,
+
             });
         }
     });
@@ -108,6 +113,27 @@ watch(() => form.search, () => {
 watch(() => form.role, () => {
     form.get(route('users.index'), { preserveState: true, replace: true })
 })
+
+function toggleStatus(id) {
+    router.put(route('users.toggleStatus', id), {}, {
+        onSuccess: () => {
+
+        },
+        onError: (errors) => {
+            console.error(errors)
+        }
+    })
+}
+
+const handleFailure = (response: any) => {
+    if (response?.status === 403) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Akses Ditolak',
+            text: response.data.message || 'Kamu tidak diizinkan.',
+        });
+    }
+};
 </script>
 
 <template>
@@ -168,11 +194,10 @@ watch(() => form.role, () => {
                                 class="appearance-none rounded-r rounded-l sm:rounded-l-none border border-gray-400 border-b block pl-8 pr-6 py-2 w-full bg-white text-sm placeholder-gray-400 text-gray-700 focus:bg-white focus:placeholder-gray-600 focus:text-gray-700 focus:outline-none" />
                         </div>
                         <div class="relative mx-2">
-                            <button v-if="can('users.create')" @click="router.get(route('users.create'))" 
-                                type="button"
+                            <button v-if="can('users.create')" @click="router.get(route('users.create'))" type="button"
                                 class=" h-full rounded border block appearance-none w-full bg-green-400 border-green-400 text-white py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-green focus:border-green-500">
-                           + Add User
-                        </button>
+                                + Add User
+                            </button>
                         </div>
 
                     </div>
@@ -199,7 +224,7 @@ watch(() => form.role, () => {
                                         </th>
                                         <th
                                             class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                            Email Status
+                                            Status
                                         </th>
                                         <th
                                             class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -242,21 +267,26 @@ watch(() => form.role, () => {
                                             </p>
                                         </td>
                                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                            <span v-if="user.email_verified_at"
-                                                class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
-                                                <span aria-hidden
-                                                    class="absolute inset-0 bg-green-200 opacity-50 rounded-full"></span>
-                                                <span class="relative">Verified</span>
+                                            <span v-if="can('users.toggleStatus')" @click="toggleStatus(user.id)"
+                                                class="cursor-pointer relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight"
+                                                :class="user.is_active ? 'text-green-900' : 'text-red-900'">
+                                                <span aria-hidden class="absolute inset-0 opacity-50 rounded-full"
+                                                    :class="user.is_active ? 'bg-green-200' : 'bg-red-200'"></span>
+                                                <span class="relative">{{ user.is_active ? 'Active' : 'Inactive'
+                                                }}</span>
                                             </span>
-                                            <span v-if="!user.email_verified_at"
-                                                class="relative inline-block px-3 py-1 font-semibold text-red-900 leading-tight">
-                                                <span aria-hidden
-                                                    class="absolute inset-0 bg-red-200 opacity-50 rounded-full"></span>
-                                                <span class="relative">Unverifed</span>
+                                            <span v-else
+                                                class="cursor-pointer relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight"
+                                                :class="user.is_active ? 'text-green-900' : 'text-red-900'">
+                                                <span aria-hidden class="absolute inset-0 opacity-50 rounded-full"
+                                                    :class="user.is_active ? 'bg-green-200' : 'bg-red-200'"></span>
+                                                <span class="relative">{{ user.is_active ? 'Active' : 'Inactive'
+                                                }}</span>
                                             </span>
                                         </td>
                                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                            <Link :href="route('users.show', user.id)" type="button"
+                                            <Link v-if="can('users.show')" :href="route('users.show', user.id)"
+                                                type="button"
                                                 class="mr-3 text-sm bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">
                                             Show</Link>
                                             <Link v-if="can('users.edit')" :href="route('users.edit', user.id)"
