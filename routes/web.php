@@ -64,9 +64,18 @@ Route::resource("users", UserController::class)
 ->only(['destroy'])
 ->middleware("permission:users.delete");
 
+Route::put('/users/{user}/toggleStatus', [UserController::class, 'toggleStatus'])
+    ->name('users.toggleStatus')
+    ->middleware('permission:users.toggleStatus');
+
+
 Route::resource("users", UserController::class)
 ->only(['index', 'show'])
 ->middleware("permission:users.create|users.edit|users.delete|users.view");
+
+Route::resource("users", UserController::class)
+->only(['show'])
+->middleware("permission:users.show");
 
 // roles
 Route::resource("roles", RoleController::class)
