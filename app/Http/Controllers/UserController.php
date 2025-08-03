@@ -157,7 +157,7 @@ class UserController extends Controller
                 'email' => $user->email,
                 'verified_email' => $user->hasVerifiedEmail(),
             ],
-            "roles" =>$roleQuery->get(),
+            "roles" => $roleQuery->get(),
             "userRoles" => $user->roles->pluck("name")->all(),
         ]);
         // return Inertia::render("Users/Edit", [
@@ -267,9 +267,8 @@ class UserController extends Controller
     {
         $auth = auth()->user();
         $user = User::findOrFail($id);
-        if(!$auth->can('users.toggleStatus')){
+        if (!$auth->can('users.toggleStatus')) {
             abort(403, 'You are not allowed to toggle Status Users.');
-
         }
         $user->is_active = !$user->is_active;
         $user->save();
