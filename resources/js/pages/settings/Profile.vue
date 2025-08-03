@@ -177,7 +177,7 @@ const { getInitials } = useInitials();
                     </p>
                 </div>
                 <div class="mt-4">
-                    <Avatar class="w-32 h-32 rounded-full object-cover profile-user-img" @click="openFileInput">
+                    <Avatar class="w-32 h-32 rounded-full object-cover">
                         <AvatarImage v-if="user.avatar || photoPreview" :src="photoPreview || '/storage/' + user.avatar"
                         alt="Foto Profil" class="w-32 h-32 rounded-full object-cover profile-user-img" @click = "openFileInput" />
                         <AvatarFallback class="rounded-lg text-black dark:text-white">

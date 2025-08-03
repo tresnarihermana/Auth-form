@@ -58,8 +58,7 @@ const rules = reactive({
     hasUppercase: false,
     hasLowercase: false,
     hasNumber: false,
-    hasSymbol: false,
-    hasSpace: false
+    hasSymbol: false
 })
 function validatePassword() {
     const val = form.password
@@ -69,7 +68,6 @@ function validatePassword() {
     rules.hasLowercase = /[a-z]/.test(val)
     rules.hasNumber = /[0-9]/.test(val)
     rules.hasSymbol = /[^A-Za-z0-9]/.test(val)
-    rules.hasSpace = /\s/.test(val)
 }
 watch(() => form.password, validatePassword)
 onMounted(() => {
@@ -127,7 +125,6 @@ const sitekey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
                                 <li v-if="!rules.hasLowercase">Harus ada huruf kecil</li>
                                 <li v-if="!rules.hasNumber">Harus ada angka</li>
                                 <li v-if="!rules.hasSymbol">Harus ada simbol (!@#$%^&*)</li>
-                                <li v-if="rules.hasSpace">Password Tidak Boleh Menggunakan Spasi</li>
                             </ul>
                         </template>
                     </Password>
