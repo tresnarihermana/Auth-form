@@ -5,6 +5,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LogController;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -110,6 +111,13 @@ Route::resource("permissions", PermissionController::class)
 Route::resource("permissions", PermissionController::class)
 ->only(['index','show'])
 ->middleware("permission:permissions.create|permissions.edit|permissions.delete|permissions.view");
+
+// Logs
+Route::resource("logs", LogController::class)
+->only(['index','show'])
+->middleware("permission:logs.view");
+
 });
+
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
