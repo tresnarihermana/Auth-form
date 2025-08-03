@@ -20,20 +20,19 @@ class VerifyEmailController extends Controller
             return redirect()->intended(route('dashboard', absolute: false) . '?verified=1')->with('message', 'Selamat Datang');
         }
 
-if ($request->user()->markEmailAsVerified()) {
-    $user = $request->user();
+        if ($request->user()->markEmailAsVerified()) {
+            $user = $request->user();
 
-    if (!empty($user->username) || !empty($user->name) || !empty($user->password)) {
-        Auth::logout(); // 💥 logout langsung
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        session(['message' => 'verify email']);
-        return redirect('/login');
+            if (!empty($user->username) || !empty($user->name) || !empty($user->password)) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                session(['message' => 'verify email']);
+                return redirect('/login');
+            }
 
-    }
-
-    event(new Verified($user));
-}
+            event(new Verified($user));
+        }
 
         return redirect()->intended(route('settings/profile', absolute: false) . '?verified=1')->with('message', 'Selamat Datang');
     }
