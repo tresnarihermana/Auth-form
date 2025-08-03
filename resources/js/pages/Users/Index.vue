@@ -67,9 +67,6 @@ function deleteUser(id) {
     }).then((result) => {
         if (result.isConfirmed) {
             router.delete(route('users.destroy', id), {
-                headers: {
-                    Accept: 'application/json', // 👈 penting
-                },
                 onSuccess: () => {
                     Swal.fire({
                         title: 'Deleted!',
@@ -86,7 +83,7 @@ function deleteUser(id) {
                         icon: 'error',
                     });
                 },
-                onFailure: handleFailure,
+                
 
             });
         }
@@ -125,15 +122,6 @@ function toggleStatus(id) {
     })
 }
 
-const handleFailure = (response: any) => {
-    if (response?.status === 403) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Akses Ditolak',
-            text: response.data.message || 'Kamu tidak diizinkan.',
-        });
-    }
-};
 </script>
 
 <template>
