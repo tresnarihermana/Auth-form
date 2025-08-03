@@ -29,7 +29,13 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+    $request->authenticate(); // user sudah berhasil login
+
+    // Cek apakah user aktif
+    if (!auth()->user()->is_active) {
+        auth()->logout(); // logout ulang biar tidak nyangkut
+        abort(403, 'Akun Anda tidak aktif.');
+    }
 
         $request->session()->regenerate();
 

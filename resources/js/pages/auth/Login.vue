@@ -32,15 +32,13 @@ const page = usePage();
 const session = page.props?.session?.message;
 if (session) {
    Swal.fire({
-  title: 'Verified Your Email',
-  html: `
-    <p>Silakan cek email kamu untuk verifikasi akun.</p>
-  `,
-  icon: 'info',
+  title: 'Harap Login Kembali',
+  icon: 'success',
+  text: 'Akun anda sudah terdaftar dan terverfikasi',
   allowOutsideClick: false,
   allowEscapeKey: false,
   showCancelButton: false,
-  confirmButtonText: 'Saya sudah verifikasi',
+  confirmButtonText: 'Baiklah',
 }).then((result) => {
   if (result.isConfirmed) {
     // Arahkan ke halaman pengecekan status verifikasi atau reload

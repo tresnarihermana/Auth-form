@@ -9,6 +9,7 @@ use Inertia\Response;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\RedirectResponse;
@@ -36,15 +37,16 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|regex:/^[a-zA-Z0-9_]+$/|unique:'.User::class,
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'password' => ['required', 'confirmed', Rules\Password::defaults(), Password::min(8)->numbers()->symbols()->max(255)->mixedCase(),'regex:/^[A-Za-z\d\W_]+$/'],
-            'g-recaptcha-response' => 'required',
+            'password' => ['required', 'confirmed', Rules\Password::defaults(), Password::min(8)->numbers()->symbols()->max(255)->mixedCase(),'regex:/^[A-Za-z0-9_\-!@#$%^&*()+=\[\]{}]+$/'
+],
+            'g-recaptcha-response' => 'required',            
         ], [
             'name.required' => 'Name is required.',
             'username.unique' => 'Username is already taken.',
             'username.regex' => 'Username can only contain letters, numbers, and underscores.',
             'email.required' => 'Email is required.',
             'password.required' => 'Password is required.',
-            'password.regex'=> 'Password can olny contain letters, numbers, and underscores.',
+            'password.regex'=> 'Password cant contain Space.',
             'password.confirmed' => 'Passwords do not match'
         ]);
         // Verifikasi ke Google reCAPTCHA
@@ -67,11 +69,12 @@ class RegisteredUserController extends Controller
             'username' => $request->username,
             'email' => $request->email,
             'password' =>  Hash::make($request->password),
+            'is_active' => true,
         ]);
-
+        $user->assignRole('user')->save();
         event(new Registered($user));
-        // Auth::login($user);
-        session(['message' => 'verify email']);
+        Auth::login($user);
+        session(['message' => 'verify email Success']);
         return to_route('login');
     }
 }

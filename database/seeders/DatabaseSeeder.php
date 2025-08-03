@@ -13,21 +13,45 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call([
+            RolePermissionSeeder::class,
+        ]);
         // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Ducky Gosh',
-            'username' => 'Ducky_Gosh',
-            'email' => 'ducky.gosh@gmail.com',
+        $Sadmin = User::factory()->create([
+            'name' => 'SuperAdmin',
+            'username' => 'Sadmin',
+            'email' => 'sadmin@gmail.com',
             'email_verified_at' => now(),
-            
         ]);
-        User::factory()->create([
-            'name' => 'User Pertama',
-            'username' => 'User_pertama',
-            'email' => 'User@gmail.com',
-            'email_verified_at' => now(),
+        $Sadmin->assignRole('Super Admin');
 
+        $admin = User::factory()->create([
+            'name' => 'Admin',
+            'username' => 'admin',
+            'email' => 'admin@gmail.com',
+            'email_verified_at' => now(),
         ]);
+        $admin->assignRole('admin');
+        
+        $operator = User::factory()->create([
+            'name' => 'Operator',
+            'username' => 'operator',
+            'email' => 'operator@gmail.com',
+            'email_verified_at' => now(),
+        ]);
+        $operator->assignRole('operator');
+        
+        $user = User::factory()->create([
+            'name' => 'First User',
+            'username' => 'user',
+            'email' => 'user@gmail.com',
+            'email_verified_at' => now(),
+        ]);
+        $user->assignRole('user');
+
+
+     User::factory(100)->create()->each(function ($user) {
+            $user->assignRole('user');
+        });
     }
 }

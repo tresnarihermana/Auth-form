@@ -9,6 +9,7 @@ import { initializeTheme } from './composables/useAppearance';
 import PrimeVue from 'primevue/config';
 import Lara from '@primeuix/themes/lara';
 import '@primeuix/themes/lara';
+import 'primeicons/primeicons.css'
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 

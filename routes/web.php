@@ -5,12 +5,18 @@ use Inertia\Inertia;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LogController;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use App\Http\Requests\Auth\LoginRequest;
 use Laravel\Socialite\Facades\Socialite;
+use Spatie\Permission\Contracts\Permission;
+use App\Http\Controllers\PermissionController;
+use App\Http\Middleware\EnsureProfileComplete;
 use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Session\Middleware\AuthenticateSession;
-use App\Http\Middleware\EnsureProfileComplete;
+
 Route::get('/', function () {
     return redirect('login');
     
@@ -35,13 +41,83 @@ Route::get('/auth/google/callback', function () {
         ]
 
     );
-
+    $user->assignRole('user');
 
     Auth::login($user);
     return redirect('/dashboard')->with("message", "Selamat datang");
 });
-
-
 Route::post('profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
+
+// Roles and Permissions mulai disini
+// users
+Route::middleware(['auth', 'web', 'verified'])->group(function () {
+    
+
+Route::resource("users", UserController::class)
+->only(['create','store'])
+->middleware("permission:users.create");
+
+Route::resource("users", UserController::class)
+->only(['edit','update'])
+->middleware("permission:users.edit");
+
+Route::resource("users", UserController::class)
+->only(['destroy'])
+->middleware("permission:users.delete");
+
+Route::put('/users/{user}/toggleStatus', [UserController::class, 'toggleStatus'])
+    ->name('users.toggleStatus')
+    ->middleware('permission:users.toggleStatus');
+
+
+Route::resource("users", UserController::class)
+->only(['index', 'show'])
+->middleware("permission:users.create|users.edit|users.delete|users.view");
+
+Route::resource("users", UserController::class)
+->only(['show'])
+->middleware("permission:users.show");
+
+// roles
+Route::resource("roles", RoleController::class)
+->only(['create','store'])
+->middleware("permission:roles.create");
+
+Route::resource("roles", RoleController::class)
+->only(['edit','update'])
+->middleware("permission:roles.edit");
+
+Route::resource("roles", RoleController::class)
+->only(['destroy'])
+->middleware("permission:roles.delete");
+
+Route::resource("roles", RoleController::class)
+->only(['index','show'])
+->middleware("permission:roles.create|roles.edit|roles.delete|roles.view");
+
+// permissions
+Route::resource("permissions", PermissionController::class)
+->only(['create','store'])
+->middleware("permission:permissions.create");
+
+Route::resource("permissions", PermissionController::class)
+->only(['edit','update'])
+->middleware("permission:permissions.edit");
+
+Route::resource("permissions", PermissionController::class)
+->only(['destroy'])
+->middleware("permission:permissions.delete");
+
+Route::resource("permissions", PermissionController::class)
+->only(['index','show'])
+->middleware("permission:permissions.create|permissions.edit|permissions.delete|permissions.view");
+
+// Logs
+Route::resource("logs", LogController::class)
+->only(['index','show'])
+->middleware("permission:logs.view");
+
+});
+
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

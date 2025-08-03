@@ -16,6 +16,9 @@
         "laravel/socialite": "^5.21",
         "laravel/tinker": "^2.10.1",
         "laravel/ui": "^4.6",
+        "opcodesio/log-viewer": "^3.19",
+        "spatie/laravel-activitylog": "^4.10",
+        "spatie/laravel-permission": "^6.21",
         "sweetalert2/laravel": "^0.1.0",
         "tightenco/ziggy": "^2.4"
     },
