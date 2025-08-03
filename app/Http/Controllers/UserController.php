@@ -260,8 +260,9 @@ class UserController extends Controller
             abort(403, 'You are not allowed to delete Super Admin.');
         };
         User::destroy($id);
-        return to_route("users.index")->response("message", "Success Delete User");
+        return to_route("users.index")->with("message", "Success Delete User");
     }
+
     public function toggleStatus(string $id)
     {
         $auth = auth()->user();
